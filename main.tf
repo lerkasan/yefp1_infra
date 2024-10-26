@@ -1,0 +1,158 @@
+module "autoscaling_group" {
+  source = "./modules/autoscaling_group"
+
+  ec2_instance_type  = var.ec2_instance_type
+  os                 = var.os
+  os_architecture    = var.os_architecture
+  os_version         = var.os_version
+  os_releases        = var.os_releases
+  ami_virtualization = var.ami_virtualization
+  ami_architectures  = var.ami_architectures
+  ami_owner_ids      = var.ami_owner_ids
+
+  appserver_private_ssh_key_name = var.appserver_private_ssh_key_name
+  admin_public_ssh_keys          = var.admin_public_ssh_keys
+  ecr_repository_names           = var.ecr_repository_names
+
+  aws_region                      = var.aws_region
+  vpc_id                          = module.network.vpc_id
+  private_subnets_ids             = module.network.private_subnets_ids
+  ec2_sg_id                       = module.security.ec2_sg_id
+  kms_key_arn                     = module.rds.kms_key_arn
+  ssm_param_db_host_arn           = module.rds.ssm_param_db_host_arn
+  ssm_param_db_name_arn           = module.rds.ssm_param_db_name_arn
+  ssm_param_db_password_arn       = module.rds.ssm_param_db_password_arn
+  ssm_param_db_username_arn       = module.rds.ssm_param_db_username_arn
+  codedeploy_deployment_group_arn = module.codedeploy.deployment_group_arn
+  ec2_connect_endpoint_sg_id      = module.security.ec2_connect_endpoint_sg_id
+  alb_target_group_arn            = module.loadbalancer.target_group_arn
+  autoscale_min_size              = var.autoscale_min_size
+  autoscale_max_size              = var.autoscale_max_size
+  autoscale_desired_capacity      = var.autoscale_desired_capacity
+  autoscale_delete_timeout        = var.autoscale_delete_timeout
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  # Dependency is used to ensure that EC2 instance will have Internet access during userdata execution to be able to install packages
+  depends_on = [module.network.internet_gateway_id, module.network.nat_gateway_ids]
+}
+
+module "loadbalancer" {
+  source = "./modules/loadbalancer"
+
+  vpc_id             = module.network.vpc_id
+  public_subnets_ids = module.network.public_subnets_ids
+  lb_sg_id = module.security.lb_sg_id
+
+  domain_name                         = var.domain_name
+  lb_name                             = var.lb_name
+  lb_internal                         = var.lb_internal
+  lb_type                             = var.lb_type
+  lb_stickiness_type                  = var.lb_stickiness_type
+  lb_health_check_path                = var.lb_health_check_path
+  lb_health_check_healthy_threshold   = var.lb_health_check_healthy_threshold
+  lb_health_check_unhealthy_threshold = var.lb_health_check_unhealthy_threshold
+  lb_health_check_interval            = var.lb_health_check_interval
+  lb_health_check_timeout             = var.lb_health_check_timeout
+  lb_deregistration_delay             = var.lb_deregistration_delay
+  lb_cookie_duration                  = var.lb_cookie_duration
+
+  project_name = var.project_name
+  environment  = var.environment
+}
+
+module "rds" {
+  source = "./modules/rds"
+
+  vpc_id              = module.network.vpc_id
+  private_subnets_ids = module.network.private_subnets_ids
+  rds_sg_id           = module.security.rds_sg_id
+  iam_role_arn        = module.autoscaling_group.iam_role_arn
+
+  rds_name                         = var.rds_name
+  database_engine                  = var.database_engine
+  database_engine_version          = var.database_engine_version
+  database_instance_class          = var.database_instance_class
+  database_storage_type            = var.database_storage_type
+  database_allocated_storage       = var.database_allocated_storage
+  database_max_allocated_storage   = var.database_max_allocated_storage
+  database_backup_retention_period = var.database_backup_retention_period
+  database_maintenance_window      = var.database_maintenance_window
+
+  database_name     = var.database_name
+  database_password = var.database_password
+  database_username = var.database_username
+
+  project_name = var.project_name
+  environment  = var.environment
+}
+
+module "codedeploy" {
+  source = "./modules/codedeploy"
+
+  target_group_name      = module.loadbalancer.target_group_name
+  autoscaling_group_name = module.autoscaling_group.name
+
+  deployment_group_name  = var.deployment_group_name
+  deployment_config_name = var.deployment_config_name
+  deployment_type        = var.deployment_type
+
+  project_name = var.project_name
+  environment  = var.environment
+}
+
+module "network" {
+  source = "./modules/network"
+
+  aws_region = var.aws_region
+
+  cidr_block          = var.cidr_block
+  public_subnets      = local.public_subnet_cidrs
+  private_subnets     = local.private_subnet_cidrs
+  vpc_endpoints_sg_id = module.security.vpc_endpoints_sg_id
+
+  project_name = var.project_name
+  environment  = var.environment
+}
+
+module "security" {
+  source = "./modules/security"
+
+  vpc_id               = module.network.vpc_id
+  private_subnet_cidrs = local.private_subnet_cidrs
+  #   admin_public_ip      = var.admin_public_ip
+
+  project_name = var.project_name
+  environment  = var.environment
+}
+
+module "ecr" {
+  source = "./modules/ecr"
+
+  ecr_repository_names     = var.ecr_repository_names
+  ecr_repository_type      = var.ecr_repository_type
+  ecr_repository_scan_type = var.ecr_repository_scan_type
+  ecr_images_limit         = var.ecr_images_limit
+  ecr_user_name            = var.ecr_user_name
+  aws_region               = var.aws_region
+
+  project_name = var.project_name
+  environment  = var.environment
+}
+
+
+resource "aws_ssm_parameter" "django_secret_key" {
+  name        = join("_", [var.project_name, "secret_key"])
+  description = "Django secret key"
+  type        = "SecureString"
+  key_id      = module.rds.kms_key_id
+  value       = var.django_secret_key
+
+  tags = {
+    Name        = join("_", [var.project_name, "secret_key"])
+    terraform   = "true"
+    environment = var.environment
+    project     = var.project_name
+  }
+}

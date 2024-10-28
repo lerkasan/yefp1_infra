@@ -202,6 +202,16 @@ variable "ssm_param_db_password_arn" {
   type        = string
 }
 
+variable "ssm_param_api_secret_key_arn" {
+  description = "ARN of the SSM parameter for the Backend API (backend_rds) secret key"
+  type        = string
+}
+
+variable "ssm_param_cache_secret_key_arn" {
+  description = "ARN of the SSM parameter for the Backend cache (backend_redis) secret key"
+  type        = string
+}
+
 variable "kms_key_arn" {
   description = "ARN of the KMS key used to encrypt the SSM parameters"
   type        = string
@@ -219,9 +229,10 @@ variable "ec2_connect_endpoint_sg_id" {
   type        = string
 }
 
-variable "alb_target_group_arn" {
+variable "alb_target_group_arns" {
   description = "A target group arn of a load balancer"
-  type        = string
+  type        = list(string)
+  default = []
 }
 
 # ------------------ ECR parameters ---------------------

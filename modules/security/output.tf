@@ -13,6 +13,11 @@ output "rds_sg_id" {
   description = "A security group id of a RDS database"
 }
 
+output "elacticache_sg_id" {
+  value       = aws_security_group.cache.id
+  description = "A security group id of Elasticache"
+}
+
 output "ec2_connect_endpoint_sg_id" {
   value       = aws_security_group.ec2_connect_endpoint.id
   description = "A security group id of a EC2"

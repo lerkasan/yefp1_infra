@@ -23,9 +23,11 @@ module "autoscaling_group" {
   ssm_param_db_name_arn           = module.rds.ssm_param_db_name_arn
   ssm_param_db_password_arn       = module.rds.ssm_param_db_password_arn
   ssm_param_db_username_arn       = module.rds.ssm_param_db_username_arn
+  ssm_param_api_secret_key_arn    = aws_ssm_parameter.django_api_secret_key.arn
+  ssm_param_cache_secret_key_arn  = aws_ssm_parameter.django_cache_secret_key.arn
   codedeploy_deployment_group_arn = module.codedeploy.deployment_group_arn
   ec2_connect_endpoint_sg_id      = module.security.ec2_connect_endpoint_sg_id
-  alb_target_group_arn            = module.loadbalancer.target_group_arn
+  alb_target_group_arns           = [module.loadbalancer.target_group_arn, module.loadbalancer.backend_redis_target_group_arn]
   autoscale_min_size              = var.autoscale_min_size
   autoscale_max_size              = var.autoscale_max_size
   autoscale_desired_capacity      = var.autoscale_desired_capacity
@@ -43,7 +45,7 @@ module "loadbalancer" {
 
   vpc_id             = module.network.vpc_id
   public_subnets_ids = module.network.public_subnets_ids
-  lb_sg_id = module.security.lb_sg_id
+  lb_sg_id           = module.security.lb_sg_id
 
   domain_name                         = var.domain_name
   lb_name                             = var.lb_name
@@ -88,6 +90,31 @@ module "rds" {
   environment  = var.environment
 }
 
+module "elasticache" {
+  source = "./modules/elasticache"
+
+  cache_replication_group_name   = var.cache_replication_group_name
+  cache_parameter_group_name     = var.cache_parameter_group_name
+  cache_parameter_group_family   = var.cache_parameter_group_family
+  redis_password                 = var.redis_password
+  cache_node_type                = var.cache_node_type
+  num_cache_clusters             = var.num_cache_clusters
+  cache_engine                   = var.cache_engine
+  cache_engine_version           = var.cache_engine_version
+  cache_port                     = var.cache_port
+  private_subnets_ids            = module.network.private_subnets_ids
+  cache_security_group_id        = module.security.elacticache_sg_id
+  cache_maintenance_window       = var.cache_maintenance_window
+  cache_snapshot_window          = var.cache_snapshot_window
+  cache_snapshot_retention_limit = var.cache_snapshot_retention_limit
+  cache_multi_az_enabled         = var.cache_multi_az_enabled
+  cache_loglevel                 = var.cache_loglevel
+  cache_log_group_name           = var.cache_log_group_name
+
+  project_name = var.project_name
+  environment  = var.environment
+}
+
 module "codedeploy" {
   source = "./modules/codedeploy"
 
@@ -101,6 +128,20 @@ module "codedeploy" {
   project_name = var.project_name
   environment  = var.environment
 }
+
+# module "codedeploy_backend_redis" {
+#   source = "./modules/codedeploy"
+
+#   target_group_name      = module.loadbalancer.backend_redis_target_group_name
+#   autoscaling_group_name = module.autoscaling_group.name
+
+#   deployment_group_name  = join("_", [var.deployment_group_name, "backend_redis"])
+#   deployment_config_name = var.deployment_config_name
+#   deployment_type        = var.deployment_type
+
+#   project_name = var.project_name
+#   environment  = var.environment
+# }
 
 module "network" {
   source = "./modules/network"
@@ -141,16 +182,30 @@ module "ecr" {
   environment  = var.environment
 }
 
-
-resource "aws_ssm_parameter" "django_secret_key" {
-  name        = join("_", [var.project_name, "secret_key"])
-  description = "Django secret key"
+resource "aws_ssm_parameter" "django_api_secret_key" {
+  name        = join("_", [var.project_name, "api_secret_key"])
+  description = "Backend API (backend_rds) - Django secret key"
   type        = "SecureString"
   key_id      = module.rds.kms_key_id
-  value       = var.django_secret_key
+  value       = var.django_api_secret_key
 
   tags = {
-    Name        = join("_", [var.project_name, "secret_key"])
+    Name        = join("_", [var.project_name, "api_secret_key"])
+    terraform   = "true"
+    environment = var.environment
+    project     = var.project_name
+  }
+}
+
+resource "aws_ssm_parameter" "django_cache_secret_key" {
+  name        = join("_", [var.project_name, "cache_secret_key"])
+  description = "Backend cache (backend_redis) - Django secret key"
+  type        = "SecureString"
+  key_id      = module.rds.kms_key_id
+  value       = var.django_cache_secret_key
+
+  tags = {
+    Name        = join("_", [var.project_name, "cache_secret_key"])
     terraform   = "true"
     environment = var.environment
     project     = var.project_name

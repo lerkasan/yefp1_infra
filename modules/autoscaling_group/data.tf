@@ -81,7 +81,9 @@ data "aws_iam_policy_document" "read_access_to_parameters_and_deployments" {
       var.ssm_param_db_host_arn,
       var.ssm_param_db_name_arn,
       var.ssm_param_db_username_arn,
-      var.ssm_param_db_password_arn
+      var.ssm_param_db_password_arn,
+      var.ssm_param_api_secret_key_arn,
+      var.ssm_param_cache_secret_key_arn,
     ]
   }
 

@@ -5,7 +5,7 @@ resource "aws_autoscaling_group" "appserver" {
   desired_capacity          = var.autoscale_desired_capacity
   health_check_grace_period = var.health_check_grace_period
   health_check_type         = var.health_check_type
-  target_group_arns         = [ var.alb_target_group_arn ]
+  target_group_arns         = var.alb_target_group_arns
   vpc_zone_identifier       = var.private_subnets_ids
 
 #  default_instance_warmup     = 300
@@ -59,10 +59,6 @@ resource "aws_launch_template" "appserver" {
 
   iam_instance_profile {
     name = aws_iam_instance_profile.this.name
-  }
-
-  network_interfaces {
-    associate_public_ip_address = false
   }
 
   block_device_mappings {

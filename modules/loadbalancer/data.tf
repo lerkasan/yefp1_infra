@@ -3,6 +3,16 @@ data "aws_route53_zone" "this" {
   private_zone = false
 }
 
+# data "aws_route53_zone" "api" {
+#   name         = join(".", ["api", var.domain_name])
+#   private_zone = false
+# }
+
+# data "aws_route53_zone" "cache" {
+#   name         = join(".", ["cache", var.domain_name])
+#   private_zone = false
+# }
+
 data "aws_acm_certificate" "this" {
   domain      = var.domain_name
   statuses    = ["ISSUED"]

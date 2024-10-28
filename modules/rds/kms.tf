@@ -25,7 +25,7 @@ resource "aws_kms_key" "ssm_param_encrypt_key" {
 }
 
 resource "aws_kms_grant" "decrypt_access_for_ec2" {
-  name              = "decrypt_access_for_ec2_boanerges"
+  name              = "decrypt_access_for_ec2"
   key_id            = aws_kms_key.ssm_param_encrypt_key.id
   grantee_principal = var.iam_role_arn
   operations        = [ "Decrypt" ]

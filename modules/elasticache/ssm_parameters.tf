@@ -1,5 +1,5 @@
-resource "aws_ssm_parameter" "redis_host" {
-  name        = join("_", [var.project_name, "redis_host"])
+resource "aws_ssm_parameter" "cache_host" {
+  name        = join("_", [var.project_name, "cache_host"])
   description = "Cache host"
   type        = "SecureString"
 #   key_id      = aws_kms_key.ssm_param_encrypt_key.id
@@ -7,15 +7,15 @@ resource "aws_ssm_parameter" "redis_host" {
 #   value       = split(":", aws_elasticache_replication_group.this.configuration_endpoint_address)[0]
 
   tags = {
-    Name        = join("_", [var.project_name, "redis_host"])
+    Name        = join("_", [var.project_name, "cache_host"])
     terraform   = "true"
     environment = var.environment
     project     = var.project_name
   }
 }
 
-resource "aws_ssm_parameter" "redis_port" {
-  name        = join("_", [var.project_name, "redis_port"])
+resource "aws_ssm_parameter" "cache_port" {
+  name        = join("_", [var.project_name, "cache_port"])
   description = "Cache port"
   type        = "SecureString"
 #   key_id      = aws_kms_key.ssm_param_encrypt_key.id
@@ -23,7 +23,7 @@ resource "aws_ssm_parameter" "redis_port" {
 #   value       = split(":", aws_elasticache_replication_group.this.configuration_endpoint_address)[1]
 
   tags = {
-    Name        = join("_", [var.project_name, "redis_port"])
+    Name        = join("_", [var.project_name, "cache_port"])
     terraform   = "true"
     environment = var.environment
     project     = var.project_name

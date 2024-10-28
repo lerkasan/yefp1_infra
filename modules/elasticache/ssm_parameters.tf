@@ -19,7 +19,7 @@ resource "aws_ssm_parameter" "redis_port" {
   description = "Cache port"
   type        = "SecureString"
 #   key_id      = aws_kms_key.ssm_param_encrypt_key.id
-  value       = split(":", aws_elasticache_replication_group.this.primary_endpoint_address)[1]
+  value       = var.cache_port
 #   value       = split(":", aws_elasticache_replication_group.this.configuration_endpoint_address)[1]
 
   tags = {

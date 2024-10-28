@@ -106,37 +106,6 @@ resource "aws_elasticache_parameter_group" "this" {
   }
 }
 
-resource "aws_ssm_parameter" "redis_password" {
-  name        = join("_", [var.project_name, "redis_password"])
-  description = "Cache password"
-  type        = "SecureString"
-#   key_id      = aws_kms_key.ssm_param_encrypt_key.id
-  value       = var.redis_password
-
-  tags = {
-    Name        = join("_", [var.project_name, "redis_password"])
-    terraform   = "true"
-    environment = var.environment
-    project     = var.project_name
-  }
-}
-
-resource "aws_ssm_parameter" "redis_host" {
-  name        = join("_", [var.project_name, "redis_host"])
-  description = "Redis host"
-  type        = "SecureString"
-#   key_id      = aws_kms_key.ssm_param_encrypt_key.id
-  value       = split(":", aws_elasticache_replication_group.this.primary_endpoint_address)[0]
-#   value       = split(":", aws_elasticache_replication_group.this.configuration_endpoint_address)[0]
-
-  tags = {
-    Name        = join("_", [var.project_name, "redis_host"])
-    terraform   = "true"
-    environment = var.environment
-    project     = var.project_name
-  }
-}
-
 resource "aws_cloudwatch_log_group" "slow_logs" {
   name          = join("_", [var.project_name, var.cache_log_group_name, "slow_logs"])
 

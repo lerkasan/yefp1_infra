@@ -1,5 +1,5 @@
 resource "aws_codedeploy_app" "this" {
-  name = var.project_name
+  name = join("_", [var.project_name, var.codedeploy_app_name])
 
   tags = {
     Name        = join("_", [var.project_name, "_appserver"])

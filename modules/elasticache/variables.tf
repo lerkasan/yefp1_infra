@@ -41,8 +41,13 @@ variable "cache_parameter_group_family" {
   }
 }
 
-variable "redis_password" {
-  description = "Cache password variable passed through a file secret.tfvars or environment variable TF_redis_password"
+variable "cache_db" {
+  description = "Cache DB variable passed through a file variables.auto.tfvars or environment variable TF_cache_db"
+  type        = string
+}
+
+variable "cache_password" {
+  description = "Cache password variable passed through a file secret.tfvars or environment variable TF_cache_password"
   type        = string
   sensitive   = true
 }

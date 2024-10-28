@@ -3,6 +3,11 @@ output "ssm_param_db_host_arn" {
   description = "ARN of the SSM parameter for the database host"
 }
 
+output "ssm_param_db_port_arn" {
+  value       = aws_ssm_parameter.database_port.arn
+  description = "ARN of the SSM parameter for the database port"
+}
+
 output "ssm_param_db_name_arn" {
   value       = aws_ssm_parameter.database_name.arn
   description = "ARN of the SSM parameter for the database name"

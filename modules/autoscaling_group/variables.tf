@@ -187,6 +187,11 @@ variable "ssm_param_db_host_arn" {
   type        = string
 }
 
+variable "ssm_param_db_port_arn" {
+  description = "ARN of the SSM parameter for the database port"
+  type        = string
+}
+
 variable "ssm_param_db_name_arn" {
   description = "ARN of the SSM parameter for the database name"
   type        = string

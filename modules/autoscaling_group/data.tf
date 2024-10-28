@@ -79,6 +79,7 @@ data "aws_iam_policy_document" "read_access_to_parameters_and_deployments" {
     actions   = [ "ssm:GetParameter" ]
     resources = [
       var.ssm_param_db_host_arn,
+      var.ssm_param_db_port_arn,
       var.ssm_param_db_name_arn,
       var.ssm_param_db_username_arn,
       var.ssm_param_db_password_arn,

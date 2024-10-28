@@ -11,7 +11,12 @@ variable "environment" {
   default       = "stage"
 }
 
-# --------------------------------
+# --------------CodeDeploy parameters ----------------------
+
+variable "codedeploy_app_name" {
+  description   = "A CodeDeploy app name"
+  type          = string
+}
 
 variable deployment_group_name {
   description   = "A deployment group name"

@@ -14,7 +14,7 @@ resource "aws_lb" "app" {
   }
 }
 
-resource "aws_lb_target_group" "app" {
+resource "aws_lb_target_group" "backend_rds_app" {
   name     = join("-", [var.project_name, "-app-tg"])
   port     = local.django_port
   protocol = "HTTP"

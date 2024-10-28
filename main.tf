@@ -20,6 +20,7 @@ module "autoscaling_group" {
   ec2_sg_id                       = module.security.ec2_sg_id
   kms_key_arn                     = module.rds.kms_key_arn
   ssm_param_db_host_arn           = module.rds.ssm_param_db_host_arn
+  ssm_param_db_port_arn           = module.rds.ssm_param_db_port_arn
   ssm_param_db_name_arn           = module.rds.ssm_param_db_name_arn
   ssm_param_db_password_arn       = module.rds.ssm_param_db_password_arn
   ssm_param_db_username_arn       = module.rds.ssm_param_db_username_arn
@@ -27,7 +28,10 @@ module "autoscaling_group" {
   ssm_param_cache_secret_key_arn  = aws_ssm_parameter.django_cache_secret_key.arn
   codedeploy_deployment_group_arn = module.codedeploy.deployment_group_arn
   ec2_connect_endpoint_sg_id      = module.security.ec2_connect_endpoint_sg_id
-  alb_target_group_arns           = [module.loadbalancer.target_group_arn, module.loadbalancer.backend_redis_target_group_arn]
+  alb_target_group_arns           = [
+                                      module.loadbalancer.backend_rds_apptarget_group_arn, 
+                                      module.loadbalancer.backend_redis_target_group_arn
+                                    ]
   autoscale_min_size              = var.autoscale_min_size
   autoscale_max_size              = var.autoscale_max_size
   autoscale_desired_capacity      = var.autoscale_desired_capacity
@@ -96,12 +100,13 @@ module "elasticache" {
   cache_replication_group_name   = var.cache_replication_group_name
   cache_parameter_group_name     = var.cache_parameter_group_name
   cache_parameter_group_family   = var.cache_parameter_group_family
-  redis_password                 = var.redis_password
   cache_node_type                = var.cache_node_type
   num_cache_clusters             = var.num_cache_clusters
   cache_engine                   = var.cache_engine
   cache_engine_version           = var.cache_engine_version
   cache_port                     = var.cache_port
+  cache_db                       = var.cache_db
+  cache_password                 = var.cache_password
   private_subnets_ids            = module.network.private_subnets_ids
   cache_security_group_id        = module.security.elacticache_sg_id
   cache_maintenance_window       = var.cache_maintenance_window
@@ -115,13 +120,14 @@ module "elasticache" {
   environment  = var.environment
 }
 
-module "codedeploy" {
+module "codedeploy_backend_rds" {
   source = "./modules/codedeploy"
 
+  codedeploy_app_name = "backend_rds"
   target_group_name      = module.loadbalancer.target_group_name
   autoscaling_group_name = module.autoscaling_group.name
 
-  deployment_group_name  = var.deployment_group_name
+  deployment_group_name  = join("_", [var.deployment_group_name, "backend_rds"])
   deployment_config_name = var.deployment_config_name
   deployment_type        = var.deployment_type
 
@@ -129,19 +135,20 @@ module "codedeploy" {
   environment  = var.environment
 }
 
-# module "codedeploy_backend_redis" {
-#   source = "./modules/codedeploy"
+module "codedeploy_backend_redis" {
+  source = "./modules/codedeploy"
 
-#   target_group_name      = module.loadbalancer.backend_redis_target_group_name
-#   autoscaling_group_name = module.autoscaling_group.name
+  codedeploy_app_name = "backend_redis"
+  target_group_name      = module.loadbalancer.backend_redis_target_group_name
+  autoscaling_group_name = module.autoscaling_group.name
 
-#   deployment_group_name  = join("_", [var.deployment_group_name, "backend_redis"])
-#   deployment_config_name = var.deployment_config_name
-#   deployment_type        = var.deployment_type
+  deployment_group_name  = join("_", [var.deployment_group_name, "backend_redis"])
+  deployment_config_name = var.deployment_config_name
+  deployment_type        = var.deployment_type
 
-#   project_name = var.project_name
-#   environment  = var.environment
-# }
+  project_name = var.project_name
+  environment  = var.environment
+}
 
 module "network" {
   source = "./modules/network"

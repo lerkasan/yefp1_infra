@@ -13,6 +13,21 @@ resource "aws_ssm_parameter" "database_host" {
   }
 }
 
+resource "aws_ssm_parameter" "database_port" {
+  name        = join("_", [var.project_name, "database_port"])
+  description = "database port"
+  type        = "SecureString"
+  key_id      = aws_kms_key.ssm_param_encrypt_key.id
+  value       = aws_db_instance.primary.port
+
+  tags = {
+    Name        = join("_", [var.project_name, "database_host"])
+    terraform   = "true"
+    environment = var.environment
+    project     = var.project_name
+  }
+}
+
 resource "aws_ssm_parameter" "database_name" {
   name        = join("_", [var.project_name, "database_name"])
   description = "Demo database name"

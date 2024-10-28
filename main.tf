@@ -14,28 +14,31 @@ module "autoscaling_group" {
   admin_public_ssh_keys          = var.admin_public_ssh_keys
   ecr_repository_names           = var.ecr_repository_names
 
-  aws_region                      = var.aws_region
-  vpc_id                          = module.network.vpc_id
-  private_subnets_ids             = module.network.private_subnets_ids
-  ec2_sg_id                       = module.security.ec2_sg_id
-  kms_key_arn                     = module.rds.kms_key_arn
-  ssm_param_db_host_arn           = module.rds.ssm_param_db_host_arn
-  ssm_param_db_port_arn           = module.rds.ssm_param_db_port_arn
-  ssm_param_db_name_arn           = module.rds.ssm_param_db_name_arn
-  ssm_param_db_password_arn       = module.rds.ssm_param_db_password_arn
-  ssm_param_db_username_arn       = module.rds.ssm_param_db_username_arn
-  ssm_param_api_secret_key_arn    = aws_ssm_parameter.django_api_secret_key.arn
-  ssm_param_cache_secret_key_arn  = aws_ssm_parameter.django_cache_secret_key.arn
-  codedeploy_deployment_group_arn = module.codedeploy.deployment_group_arn
-  ec2_connect_endpoint_sg_id      = module.security.ec2_connect_endpoint_sg_id
-  alb_target_group_arns           = [
-                                      module.loadbalancer.backend_rds_apptarget_group_arn, 
-                                      module.loadbalancer.backend_redis_target_group_arn
-                                    ]
-  autoscale_min_size              = var.autoscale_min_size
-  autoscale_max_size              = var.autoscale_max_size
-  autoscale_desired_capacity      = var.autoscale_desired_capacity
-  autoscale_delete_timeout        = var.autoscale_delete_timeout
+  aws_region                     = var.aws_region
+  vpc_id                         = module.network.vpc_id
+  private_subnets_ids            = module.network.private_subnets_ids
+  ec2_sg_id                      = module.security.ec2_sg_id
+  kms_key_arn                    = module.rds.kms_key_arn
+  ssm_param_db_host_arn          = module.rds.ssm_param_db_host_arn
+  ssm_param_db_port_arn          = module.rds.ssm_param_db_port_arn
+  ssm_param_db_name_arn          = module.rds.ssm_param_db_name_arn
+  ssm_param_db_password_arn      = module.rds.ssm_param_db_password_arn
+  ssm_param_db_username_arn      = module.rds.ssm_param_db_username_arn
+  ssm_param_api_secret_key_arn   = aws_ssm_parameter.django_api_secret_key.arn
+  ssm_param_cache_secret_key_arn = aws_ssm_parameter.django_cache_secret_key.arn
+  codedeploy_deployment_group_arns = [
+    module.codedeploy_backend_rds.deployment_group_arn,
+    module.codedeploy_backend_redis.deployment_group_arn
+  ]
+  ec2_connect_endpoint_sg_id = module.security.ec2_connect_endpoint_sg_id
+  alb_target_group_arns = [
+    module.loadbalancer.backend_rds_target_group_arn,
+    module.loadbalancer.backend_redis_target_group_arn
+  ]
+  autoscale_min_size         = var.autoscale_min_size
+  autoscale_max_size         = var.autoscale_max_size
+  autoscale_desired_capacity = var.autoscale_desired_capacity
+  autoscale_delete_timeout   = var.autoscale_delete_timeout
 
   project_name = var.project_name
   environment  = var.environment
@@ -123,8 +126,8 @@ module "elasticache" {
 module "codedeploy_backend_rds" {
   source = "./modules/codedeploy"
 
-  codedeploy_app_name = "backend_rds"
-  target_group_name      = module.loadbalancer.target_group_name
+  codedeploy_app_name    = "backend_rds"
+  target_group_name      = module.loadbalancer.backend_rds_target_group_name
   autoscaling_group_name = module.autoscaling_group.name
 
   deployment_group_name  = join("_", [var.deployment_group_name, "backend_rds"])
@@ -138,7 +141,7 @@ module "codedeploy_backend_rds" {
 module "codedeploy_backend_redis" {
   source = "./modules/codedeploy"
 
-  codedeploy_app_name = "backend_redis"
+  codedeploy_app_name    = "backend_redis"
   target_group_name      = module.loadbalancer.backend_redis_target_group_name
   autoscaling_group_name = module.autoscaling_group.name
 

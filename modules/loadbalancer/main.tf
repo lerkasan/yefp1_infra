@@ -163,7 +163,7 @@ resource "aws_lb_listener_rule" "backend_rds" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.app.arn
+    target_group_arn = aws_lb_target_group.backend_rds_app.arn
   }
 
 #   condition {

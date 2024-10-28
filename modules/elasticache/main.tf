@@ -37,7 +37,7 @@ resource "aws_elasticache_replication_group" "this" {
   at_rest_encryption_enabled = true
   transit_encryption_enabled = true
 #   kms_key_id = ""
-  auth_token                 = aws_ssm_parameter.redis_password.value
+  auth_token                 = aws_ssm_parameter.cache_password.value
   auth_token_update_strategy = "SET"  # "ROTATE"
 
   log_delivery_configuration {

@@ -70,7 +70,7 @@ data "aws_iam_policy_document" "read_access_to_parameters_and_deployments" {
       "codedeploy:GetDeployment",
       "codedeploy:ListDeployments"
     ]
-    resources = [ var.codedeploy_deployment_group_arn ]
+    resources = var.codedeploy_deployment_group_arns
   }
 
   statement {

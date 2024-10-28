@@ -175,9 +175,9 @@ variable "vpc_id" {
 
 # ---------------- CodeDeploy parameters -------------------
 
-variable "codedeploy_deployment_group_arn" {
-  description = "ARN of a CodeDeploy deployment group"
-  type        = string
+variable "codedeploy_deployment_group_arns" {
+  description = "ARNs of a CodeDeploy deployment groups"
+  type        = list(string)
 }
 
 # ---------------- SSM parameters -------------------

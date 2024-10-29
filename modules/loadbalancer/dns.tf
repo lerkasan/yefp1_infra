@@ -29,7 +29,7 @@ resource "aws_route53_record" "api" {
   alias {
     name                   = aws_lb.app.dns_name
     zone_id                = aws_lb.app.zone_id
-    evaluate_target_health = true
+    evaluate_target_health = false
   }
 }
 
@@ -52,7 +52,7 @@ resource "aws_route53_record" "cache" {
   alias {
     name                   = aws_lb.app.dns_name
     zone_id                = aws_lb.app.zone_id
-    evaluate_target_health = true
+    evaluate_target_health = false
   }
 }
 

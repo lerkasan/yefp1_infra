@@ -16,7 +16,8 @@ resource "aws_lb" "app" {
 
 resource "aws_lb_target_group" "backend_rds_app" {
   name     = join("-", [var.project_name, "-app-tg"])
-  port     = local.django_port
+#   name     = join("-", [var.project_name, "backend-rds-app-tg"])
+  port     = local.backend_rds_app_port
   protocol = "HTTP"
   vpc_id   = var.vpc_id
   deregistration_delay = var.lb_deregistration_delay
@@ -38,6 +39,7 @@ resource "aws_lb_target_group" "backend_rds_app" {
 
   tags = {
     Name        = join("_", [var.project_name, "_app_tg"])
+    # Name        = join("_", [var.project_name, "backend_rds_app_tg"])
     terraform   = "true"
     environment = var.environment
     project     = var.project_name
@@ -109,25 +111,26 @@ resource "aws_lb_listener" "https" {
 #     target_group_arn = aws_lb_target_group.app.arn
 #   }
 
-  default_action {
-    type = "fixed-response"
-
-    fixed_response {
-      content_type = "text/plain"
-      message_body = "OK"
-      status_code  = "200"
-    }
-  }
-
 #   default_action {
 #     type = "fixed-response"
 
 #     fixed_response {
 #       content_type = "text/plain"
-#       message_body = "Not Found"
-#       status_code  = "404"
+#       message_body = "OK"
+#       status_code  = "200"
 #     }
 #   }
+
+  default_action {
+    type = "redirect"
+
+    redirect {
+      host        = local.website_domain_name
+      port        = local.https_port
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
 
   tags = {
     Name        = join("_", [var.project_name, "_app_lb_listener"])

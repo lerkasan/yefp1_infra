@@ -599,3 +599,62 @@ variable "cache_log_group_name" {
   description = "cache log_group name for CloudWatch"
   type        = string
 }
+
+# ------------------------------- Cloudfront parameters --------------------------------
+
+variable "cloudfront_price_class" {
+  description = "Cloudfront price class"
+  type        = string
+  default     = "PriceClass_100"
+
+  validation {
+    condition     = contains(["PriceClass_100", "PriceClass_200", "PriceClass_ALL"], var.cloudfront_price_class)
+    error_message = "Valid values for a variable cloudfront_price_class are: PriceClass_100 | PriceClass_200 | PriceClass_ALL"
+  }
+}
+
+variable "cloudfront_website_access_logs_bucket_name" {
+  description = "Bucket name for website access logs "
+  type        = string
+}
+
+variable "cloudfront_s3_origin_bucket_domain_name" {
+  description = "Regional domain name of a website S3 bucket" #aws_s3_bucket.b.bucket_regional_domain_name
+  type        = string
+}
+
+variable "cloudfront_allowed_methods" {
+  description = "Allowed methods for Cloudfront distribution"
+  type        = list(string)
+  default     = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+}
+
+variable "cloudfront_default_ttl" {
+  description = "Cloudfront default TTL"
+  type        = number
+  default     = 3600
+
+  validation {
+    condition     = tonumber(var.cloudfront_default_ttl) == floor(var.cloudfront_default_ttl)
+    error_message = "default_ttl should be an integer!"
+  }
+  validation {
+    condition     = var.cloudfront_default_ttl >= 0
+    error_message = "default_ttl should be a positive integer!"
+  }
+}
+
+variable "cloudfront_max_ttl" {
+  description = "Cloudfront max TTL"
+  type        = number
+  default     = 86400
+
+  validation {
+    condition     = tonumber(var.cloudfront_max_ttl) == floor(var.cloudfront_max_ttl)
+    error_message = "max_ttl should be an integer!"
+  }
+  validation {
+    condition     = var.cloudfront_max_ttl >= 0
+    error_message = "max_ttl should be a positive integer!"
+  }
+}

@@ -192,6 +192,40 @@ module "ecr" {
   environment  = var.environment
 }
 
+module "s3_website_origin" {
+  source = "./modules/s3"
+
+  bucket_name                 = join("-", [var.project_name, "website-origin"])
+  is_website                  = true
+  cloudfront_distribution_arn = module.cloudfront.cloudfront_distribution_arn
+
+  project_name = var.project_name
+  environment  = var.environment
+}
+
+module "s3_website_access_logs" {
+  source = "./modules/s3"
+
+  bucket_name = join("-", [var.project_name, "website-access-logs"])
+  is_website  = false
+
+  project_name = var.project_name
+  environment  = var.environment
+}
+
+module "cloudfront" {
+  source = "./modules/cloudfront"
+
+  price_class                     = var.cloudfront_price_class
+  domain_name                     = var.domain_name
+  s3_origin_bucket_domain_name    = module.s3_website_origin.s3_origin_bucket_domain_name
+  website_access_logs_bucket_name = module.s3_website_access_logs.s3_bucket_domain_name
+  allowed_methods                 = var.cloudfront_allowed_methods
+
+  project_name = var.project_name
+  environment  = var.environment
+}
+
 resource "aws_ssm_parameter" "django_api_secret_key" {
   name        = join("_", [var.project_name, "api_secret_key"])
   description = "Backend API (backend_rds) - Django secret key"

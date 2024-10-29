@@ -462,6 +462,7 @@ variable "ecr_user_name" {
   sensitive   = true
 }
 
+# ------------------ Backend parameters -------------------------
 variable "django_api_secret_key" {
   description = "Django API (backend_rds) secret key"
   type        = string
@@ -472,6 +473,11 @@ variable "django_cache_secret_key" {
   description = "Django cache (backend_redis) secret key"
   type        = string
   sensitive   = true
+}
+
+variable "django_cors_allowed_origins" {
+  description = "CORS allowed origins for Django"
+  type        = string
 }
 
 # --------------- Cache parameters

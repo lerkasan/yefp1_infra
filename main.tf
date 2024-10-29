@@ -221,6 +221,8 @@ module "cloudfront" {
   s3_origin_bucket_domain_name    = module.s3_website_origin.s3_origin_bucket_domain_name
   website_access_logs_bucket_name = module.s3_website_access_logs.s3_bucket_domain_name
   allowed_methods                 = var.cloudfront_allowed_methods
+  default_ttl                     = var.cloudfront_default_ttl
+  max_ttl                         = var.cloudfront_max_ttl
 
   project_name = var.project_name
   environment  = var.environment
@@ -230,7 +232,7 @@ resource "aws_ssm_parameter" "django_api_secret_key" {
   name        = join("_", [var.project_name, "api_secret_key"])
   description = "Backend API (backend_rds) - Django secret key"
   type        = "SecureString"
-  key_id      = module.rds.kms_key_id
+  key_id      = module.rds.kms_key_id ##### TODO
   value       = var.django_api_secret_key
 
   tags = {
@@ -245,11 +247,25 @@ resource "aws_ssm_parameter" "django_cache_secret_key" {
   name        = join("_", [var.project_name, "cache_secret_key"])
   description = "Backend cache (backend_redis) - Django secret key"
   type        = "SecureString"
-  key_id      = module.rds.kms_key_id
+  key_id      = module.rds.kms_key_id ##### TODO
   value       = var.django_cache_secret_key
 
   tags = {
     Name        = join("_", [var.project_name, "cache_secret_key"])
+    terraform   = "true"
+    environment = var.environment
+    project     = var.project_name
+  }
+}
+
+resource "aws_ssm_parameter" "django_cors_allowed_origins" {
+  name        = join("_", [var.project_name, "cors_allowed_origins"])
+  description = "CORS allowed origins for backend"
+  type        = "SecureString"
+  value       = var.django_cors_allowed_origins
+
+  tags = {
+    Name        = join("_", [var.project_name, "cors_allowed_origins"])
     terraform   = "true"
     environment = var.environment
     project     = var.project_name

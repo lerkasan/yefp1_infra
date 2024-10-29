@@ -10,20 +10,21 @@ resource "aws_route53_record" "this" {
   }
 }
 
-resource "aws_route53_zone" "api" {
-  name = join(".", ["api", data.aws_route53_zone.this.name])
+# resource "aws_route53_zone" "api" {
+#   name = join(".", ["api", data.aws_route53_zone.this.name])
 
-  tags = {
-    Name        = join("_", [var.project_name, "_api_route53_zone"])
-    terraform   = "true"
-    environment = var.environment
-    project     = var.project_name
-  }
-}
+#   tags = {
+#     Name        = join("_", [var.project_name, "_api_route53_zone"])
+#     terraform   = "true"
+#     environment = var.environment
+#     project     = var.project_name
+#   }
+# }
 
 resource "aws_route53_record" "api" {
-  zone_id = aws_route53_zone.api.zone_id
-  name    = aws_route53_zone.api.name
+  zone_id = data.aws_route53_zone.this.zone_id
+#   zone_id = aws_route53_zone.api.zone_id
+  name    = local.api_domain_name
   type    = "A"
 
   alias {
@@ -33,20 +34,21 @@ resource "aws_route53_record" "api" {
   }
 }
 
-resource "aws_route53_zone" "cache" {
-  name = join(".", ["cache", data.aws_route53_zone.this.name])
+# resource "aws_route53_zone" "cache" {
+#   name = join(".", ["cache", data.aws_route53_zone.this.name])
 
-  tags = {
-    Name        = join("_", [var.project_name, "_cache_route53_zone"])
-    terraform   = "true"
-    environment = var.environment
-    project     = var.project_name
-  }
-}
+#   tags = {
+#     Name        = join("_", [var.project_name, "_cache_route53_zone"])
+#     terraform   = "true"
+#     environment = var.environment
+#     project     = var.project_name
+#   }
+# }
 
 resource "aws_route53_record" "cache" {
-  zone_id = aws_route53_zone.cache.zone_id
-  name    = aws_route53_zone.cache.name
+  zone_id = data.aws_route53_zone.this.zone_id
+#   zone_id = aws_route53_zone.cache.zone_id
+  name    = local.cache_domain_name
   type    = "A"
 
   alias {
@@ -59,7 +61,7 @@ resource "aws_route53_record" "cache" {
 
 
 resource "aws_acm_certificate" "api" {
-  domain_name       = aws_route53_zone.api.name
+  domain_name       = local.api_domain_name
   validation_method = "DNS"
 }
 
@@ -87,7 +89,7 @@ resource "aws_acm_certificate_validation" "api" {
 
 
 resource "aws_acm_certificate" "cache" {
-  domain_name       = aws_route53_zone.cache.name
+  domain_name       = local.cache_domain_name
   validation_method = "DNS"
 }
 

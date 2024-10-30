@@ -197,6 +197,7 @@ module "s3_website_origin" {
 
   bucket_name                 = join("-", [var.project_name, "website-origin"])
   is_website                  = true
+  s3_object_ownership         = "BucketOwnerEnforced"
   cloudfront_distribution_arn = module.cloudfront.cloudfront_distribution_arn
 
   project_name = var.project_name
@@ -206,8 +207,9 @@ module "s3_website_origin" {
 module "s3_website_access_logs" {
   source = "./modules/s3"
 
-  bucket_name = join("-", [var.project_name, "website-access-logs"])
-  is_website  = false
+  bucket_name         = join("-", [var.project_name, "website-access-logs"])
+  is_website          = false
+  s3_object_ownership = "BucketOwnerPreferred"
 
   project_name = var.project_name
   environment  = var.environment
@@ -220,6 +222,8 @@ module "cloudfront" {
   domain_name                     = var.domain_name
   s3_origin_bucket_domain_name    = module.s3_website_origin.s3_origin_bucket_domain_name
   website_access_logs_bucket_name = module.s3_website_access_logs.s3_bucket_domain_name
+  waf_enabled                     = var.cloudfront_waf_enabled
+  origin_shield_enabled           = var.cloudfront_origin_shield_enabled
   allowed_methods                 = var.cloudfront_allowed_methods
   default_ttl                     = var.cloudfront_default_ttl
   max_ttl                         = var.cloudfront_max_ttl

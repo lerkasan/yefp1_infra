@@ -664,3 +664,15 @@ variable "cloudfront_max_ttl" {
     error_message = "max_ttl should be a positive integer!"
   }
 }
+
+variable "cloudfront_waf_enabled" {
+  description = "Whether WAF protection should be enabled for CloudFront distribution"
+  type        = bool
+  default     = true
+}
+
+variable "cloudfront_origin_shield_enabled" {
+  description = "Whether origin shield should be enabled for CloudFront distribution"
+  type        = bool
+  default     = true
+}

@@ -11,6 +11,12 @@ variable "environment" {
   default       = "stage"
 }
 
+variable "aws_region" {
+  description   = "AWS region"
+  type          = string
+  default       = "us-east-1"
+}
+
 variable "domain_name" {
   description   = "Domain name"
   type          = string
@@ -78,3 +84,14 @@ variable "max_ttl" {
   }
 }
 
+variable "waf_enabled" {
+  description = "Whether WAF protection should be enabled for CloudFront distribution"
+  type = bool
+  default = true
+}
+
+variable "origin_shield_enabled" {
+  description = "Whether origin shield should be enabled for CloudFront distribution"
+  type = bool
+  default = true
+}

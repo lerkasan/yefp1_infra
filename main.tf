@@ -181,6 +181,7 @@ module "security" {
 module "ecr" {
   source = "./modules/ecr"
 
+  github_repositories      = var.github_repositories
   ecr_repository_names     = var.ecr_repository_names
   ecr_repository_type      = var.ecr_repository_type
   ecr_repository_scan_type = var.ecr_repository_scan_type

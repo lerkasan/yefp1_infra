@@ -53,6 +53,11 @@ variable "ecr_user_name" {
   sensitive = true
 }
 
+variable "github_repositories" {
+  description = "Github repositories included in trust policy for Github OIDC"
+  type = list(string)
+}
+
 variable "project_name" {
   description   = "Project name"
   type          = string

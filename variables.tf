@@ -39,6 +39,11 @@ variable "admin_public_ip" {
   }
 }
 
+variable "github_repositories" {
+  description = "Github repositories included in trust policy for Github OIDC"
+  type        = list(string)
+}
+
 # -------------------- Autoscaling parameters -----------------------
 
 variable "autoscale_max_size" {

@@ -79,6 +79,20 @@ resource "aws_launch_template" "appserver" {
     }
 }
 
+resource "aws_autoscaling_policy" "avg_cpu_utilization" {
+  name    = join("_", [var.project_name, "_appserver_autoscaling_policy"])
+  autoscaling_group_name = aws_autoscaling_group.appserver.name
+  adjustment_type        = "ChangeInCapacity"
+  policy_type = "TargetTrackingScaling"
+#   cooldown = 300
+  target_tracking_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ASGAverageCPUUtilization"
+    }
+    target_value = 80.0
+  }
+}
+
 resource "aws_ec2_instance_connect_endpoint" "this" {
   subnet_id             = var.private_subnets_ids[0]
   security_group_ids    = [ var.ec2_connect_endpoint_sg_id ]

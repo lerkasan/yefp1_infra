@@ -80,16 +80,17 @@ resource "aws_launch_template" "appserver" {
 }
 
 resource "aws_autoscaling_policy" "avg_cpu_utilization" {
-  name    = join("_", [var.project_name, "_appserver_autoscaling_policy"])
+  name    = join("_", [var.project_name, "_target_tracking_autoscaling_policy"])
   autoscaling_group_name = aws_autoscaling_group.appserver.name
   adjustment_type        = "ChangeInCapacity"
   policy_type = "TargetTrackingScaling"
-#   cooldown = 300
+  estimated_instance_warmup = var.autoscale_estimated_instance_warmup #600
+
   target_tracking_configuration {
     predefined_metric_specification {
       predefined_metric_type = "ASGAverageCPUUtilization"
     }
-    target_value = 80.0
+    target_value = var.autoscale_avg_cpu_utilization_target #60.0
   }
 }
 

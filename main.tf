@@ -26,19 +26,25 @@ module "autoscaling_group" {
   ssm_param_db_username_arn      = module.rds.ssm_param_db_username_arn
   ssm_param_api_secret_key_arn   = aws_ssm_parameter.django_api_secret_key.arn
   ssm_param_cache_secret_key_arn = aws_ssm_parameter.django_cache_secret_key.arn
+
   codedeploy_deployment_group_arns = [
     module.codedeploy_backend_rds.deployment_group_arn,
     module.codedeploy_backend_redis.deployment_group_arn
   ]
+
   ec2_connect_endpoint_sg_id = module.security.ec2_connect_endpoint_sg_id
+
   alb_target_group_arns = [
     module.loadbalancer.backend_rds_target_group_arn,
     module.loadbalancer.backend_redis_target_group_arn
   ]
-  autoscale_min_size         = var.autoscale_min_size
-  autoscale_max_size         = var.autoscale_max_size
-  autoscale_desired_capacity = var.autoscale_desired_capacity
-  autoscale_delete_timeout   = var.autoscale_delete_timeout
+
+  autoscale_min_size                   = var.autoscale_min_size
+  autoscale_max_size                   = var.autoscale_max_size
+  autoscale_desired_capacity           = var.autoscale_desired_capacity
+  autoscale_delete_timeout             = var.autoscale_delete_timeout
+  autoscale_estimated_instance_warmup  = var.autoscale_estimated_instance_warmup
+  autoscale_avg_cpu_utilization_target = var.autoscale_avg_cpu_utilization_target
 
   project_name = var.project_name
   environment  = var.environment
@@ -181,7 +187,7 @@ module "security" {
 module "ecr" {
   source = "./modules/ecr"
 
-  github_repositories      = var.github_repositories
+  github_repositories      = var.github_repositories_backend
   ecr_repository_names     = var.ecr_repository_names
   ecr_repository_type      = var.ecr_repository_type
   ecr_repository_scan_type = var.ecr_repository_scan_type
@@ -221,6 +227,8 @@ module "cloudfront" {
 
   price_class                     = var.cloudfront_price_class
   domain_name                     = var.domain_name
+  github_repositories             = var.github_repositories_frontend
+  s3_bucket_arn                   = module.s3_website_origin.s3_bucket_arn
   s3_origin_bucket_domain_name    = module.s3_website_origin.s3_origin_bucket_domain_name
   website_access_logs_bucket_name = module.s3_website_access_logs.s3_bucket_domain_name
   waf_enabled                     = var.cloudfront_waf_enabled
@@ -237,8 +245,8 @@ resource "aws_ssm_parameter" "django_api_secret_key" {
   name        = join("_", [var.project_name, "api_secret_key"])
   description = "Backend API (backend_rds) - Django secret key"
   type        = "SecureString"
-  key_id      = module.rds.kms_key_id ##### TODO
-  value       = var.django_api_secret_key
+  #   key_id      = module.rds.kms_key_id 
+  value = var.django_api_secret_key
 
   tags = {
     Name        = join("_", [var.project_name, "api_secret_key"])
@@ -252,8 +260,8 @@ resource "aws_ssm_parameter" "django_cache_secret_key" {
   name        = join("_", [var.project_name, "cache_secret_key"])
   description = "Backend cache (backend_redis) - Django secret key"
   type        = "SecureString"
-  key_id      = module.rds.kms_key_id ##### TODO
-  value       = var.django_cache_secret_key
+  #   key_id      = module.rds.kms_key_id
+  value = var.django_cache_secret_key
 
   tags = {
     Name        = join("_", [var.project_name, "cache_secret_key"])

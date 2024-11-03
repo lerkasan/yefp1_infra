@@ -77,13 +77,13 @@ variable "lb_deregistration_delay" {
   default = 300
 
   validation {
-		condition = tonumber(var.lb_deregistration_delay) == floor(var.lb_deregistration_delay)
-		error_message = "lb_deregistration_delay should be an integer!"
-	}
+    condition = tonumber(var.lb_deregistration_delay) == floor(var.lb_deregistration_delay)
+    error_message = "lb_deregistration_delay should be an integer!"
+  }
   validation {
-		condition = var.lb_deregistration_delay >= 0
-		error_message = "lb_deregistration_delay should be a positive integer!"
-	}
+    condition = var.lb_deregistration_delay >= 0
+    error_message = "lb_deregistration_delay should be a positive integer!"
+  }
 }
 
 variable "lb_health_check_path" {
@@ -98,13 +98,13 @@ variable "lb_health_check_healthy_threshold" {
   default = 3
 
   validation {
-		condition = tonumber(var.lb_health_check_healthy_threshold) == floor(var.lb_health_check_healthy_threshold)
-		error_message = "lb_health_check_healthy_threshold should be an integer!"
-	}
+    condition = tonumber(var.lb_health_check_healthy_threshold) == floor(var.lb_health_check_healthy_threshold)
+    error_message = "lb_health_check_healthy_threshold should be an integer!"
+  }
   validation {
-		condition = var.lb_health_check_healthy_threshold >= 0
-		error_message = "lb_health_check_healthy_threshold should be a positive integer!"
-	}
+    condition = var.lb_health_check_healthy_threshold >= 0
+    error_message = "lb_health_check_healthy_threshold should be a positive integer!"
+  }
 }
 
 variable "lb_health_check_unhealthy_threshold" {
@@ -113,13 +113,13 @@ variable "lb_health_check_unhealthy_threshold" {
   default = 3
 
   validation {
-		condition = tonumber(var.lb_health_check_unhealthy_threshold) == floor(var.lb_health_check_unhealthy_threshold)
-		error_message = "lb_health_check_unhealthy_threshold should be an integer!"
-	}
+    condition = tonumber(var.lb_health_check_unhealthy_threshold) == floor(var.lb_health_check_unhealthy_threshold)
+    error_message = "lb_health_check_unhealthy_threshold should be an integer!"
+  }
   validation {
-		condition = var.lb_health_check_unhealthy_threshold >= 0
-		error_message = "lb_health_check_unhealthy_threshold should be a positive integer!"
-	}
+    condition = var.lb_health_check_unhealthy_threshold >= 0
+    error_message = "lb_health_check_unhealthy_threshold should be a positive integer!"
+  }
 }
 
 variable "lb_health_check_interval" {
@@ -128,13 +128,13 @@ variable "lb_health_check_interval" {
   default = 60
 
   validation {
-		condition = tonumber(var.lb_health_check_interval) == floor(var.lb_health_check_interval)
-		error_message = "lb_health_check_interval should be an integer!"
-	}
+    condition = tonumber(var.lb_health_check_interval) == floor(var.lb_health_check_interval)
+    error_message = "lb_health_check_interval should be an integer!"
+  }
   validation {
-		condition = var.lb_health_check_interval >= 0
-		error_message = "lb_health_check_interval should be a positive integer!"
-	}
+    condition = var.lb_health_check_interval >= 0
+    error_message = "lb_health_check_interval should be a positive integer!"
+  }
 }
 
 variable "lb_health_check_timeout" {
@@ -143,13 +143,13 @@ variable "lb_health_check_timeout" {
   default = 30
 
   validation {
-		condition = tonumber(var.lb_health_check_timeout) == floor(var.lb_health_check_timeout)
-		error_message = "lb_health_check_timeout should be an integer!"
-	}
+    condition = tonumber(var.lb_health_check_timeout) == floor(var.lb_health_check_timeout)
+    error_message = "lb_health_check_timeout should be an integer!"
+  }
   validation {
-		condition = var.lb_health_check_timeout >= 0
-		error_message = "lb_health_check_timeout should be a positive integer!"
-	}
+    condition = var.lb_health_check_timeout >= 0
+    error_message = "lb_health_check_timeout should be a positive integer!"
+  }
 }
 
 variable "lb_cookie_duration" {
@@ -158,11 +158,11 @@ variable "lb_cookie_duration" {
   default = 86400
 
   validation {
-		condition = tonumber(var.lb_cookie_duration) == floor(var.lb_cookie_duration)
-		error_message = "lb_cookie_duration should be an integer!"
-	}
+    condition = tonumber(var.lb_cookie_duration) == floor(var.lb_cookie_duration)
+    error_message = "lb_cookie_duration should be an integer!"
+  }
   validation {
-		condition = var.lb_cookie_duration >= 0
-		error_message = "lb_cookie_durationshould be a positive integer!"
-	}
+    condition = var.lb_cookie_duration >= 0
+    error_message = "lb_cookie_durationshould be a positive integer!"
+  }
 }

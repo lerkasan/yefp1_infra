@@ -22,6 +22,11 @@ variable "domain_name" {
   type          = string
 }
 
+variable "github_repositories" {
+  description = "Github repositories included in trust policy for Github OIDC"
+  type = list(string)
+}
+
 variable "price_class" {
   description   = "Cloudfront price class"
   type          = string
@@ -39,6 +44,11 @@ variable "website_access_logs_bucket_name" {
 
 variable "s3_origin_bucket_domain_name" {
   description   = "Regional domain name of a website S3 bucket"
+  type          = string
+}
+
+variable "s3_bucket_arn" {
+  description   = "ARN of a website S3 bucket"
   type          = string
 }
 

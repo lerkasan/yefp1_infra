@@ -39,7 +39,12 @@ variable "admin_public_ip" {
   }
 }
 
-variable "github_repositories" {
+variable "github_repositories_backend" {
+  description = "Github repositories included in trust policy for Github OIDC"
+  type        = list(string)
+}
+
+variable "github_repositories_frontend" {
   description = "Github repositories included in trust policy for Github OIDC"
   type        = list(string)
 }
@@ -64,6 +69,43 @@ variable "autoscale_desired_capacity" {
   default     = 2
 }
 
+variable "autoscale_delete_timeout" {
+  description = "Autoscale delete timeout"
+  type        = string
+  default     = "5m"
+}
+
+variable "autoscale_estimated_instance_warmup" {
+  description = "Estimated EC2 instance warmup in seconds (used in autoscaling policy)"
+  type        = number
+  default     = 300
+
+  validation {
+    condition     = tonumber(var.autoscale_estimated_instance_warmup) == floor(var.autoscale_estimated_instance_warmup)
+    error_message = "autoscale_estimated_instance_warmup should be an integer!"
+  }
+  validation {
+    condition     = var.autoscale_estimated_instance_warmup >= 0
+    error_message = "autoscale_estimated_instance_warmup should be a positive integer!"
+  }
+}
+
+variable "autoscale_avg_cpu_utilization_target" {
+  description = "Target value for average CPU utilization of the whole autoscaling group (used in autoscaling policy)"
+  type        = number
+  default     = 60.0
+
+  validation {
+    condition     = var.autoscale_avg_cpu_utilization_target >= 40
+    error_message = "autoscale_avg_cpu_utilization_target should be more or equal to 40."
+  }
+
+  validation {
+    condition     = var.autoscale_avg_cpu_utilization_target <= 80
+    error_message = "autoscale_avg_cpu_utilization_target should be less or equal to 80."
+  }
+}
+
 variable "health_check_grace_period" {
   description = "Health check grace period in seconds"
   type        = number
@@ -75,12 +117,6 @@ variable "health_check_type" {
   type        = string
   default     = "ELB"
 }
-
-variable "autoscale_delete_timeout" {
-  description = "Autoscale delete timeout"
-  type        = string
-  default     = "5m"
-} # "15m"
 
 # -------------------- EC2 parameters -------------------------------
 

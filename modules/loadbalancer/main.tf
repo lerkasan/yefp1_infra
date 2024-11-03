@@ -4,7 +4,14 @@ resource "aws_lb" "app" {
   load_balancer_type = var.lb_type
   security_groups    = [ var.lb_sg_id ]
   subnets            = var.public_subnets_ids
+  drop_invalid_header_fields = true
 #   enable_deletion_protection = true
+
+  access_logs {
+    bucket  = var.website_access_logs_bucket_name
+    prefix  = join("-", [var.project_name, "alb"])
+    enabled = true
+  }
 
   tags = {
     Name        = join("_", [var.project_name, "_app_alb"])
@@ -103,7 +110,7 @@ resource "aws_lb_listener" "https" {
   load_balancer_arn = aws_lb.app.arn
   port              = local.https_port
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = data.aws_acm_certificate.this.arn
 
 #   default_action {

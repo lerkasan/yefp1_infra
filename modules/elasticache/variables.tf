@@ -149,3 +149,18 @@ variable "cache_log_group_name" {
   description = "cache log_group name for CloudWatch"
   type        = string
 }
+
+variable "cache_log_retention_in_days" {
+  description = "Number of days to keep Elasticache logs in CloudWatch"
+  type        = number
+  default     = 90
+
+  validation {
+    condition     = tonumber(var.cache_log_retention_in_days) == floor(var.cache_log_retention_in_days)
+    error_message = "cache_log_retention_in_days should be an integer!"
+  }
+  validation {
+    condition     = var.cache_log_retention_in_days >= 0
+    error_message = "cache_log_retention_in_days should be a positive integer!"
+  }
+}

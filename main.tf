@@ -12,6 +12,7 @@ module "autoscaling_group" {
 
   appserver_private_ssh_key_name = var.appserver_private_ssh_key_name
   admin_public_ssh_keys          = var.admin_public_ssh_keys
+  ec2_log_retention_in_days      = var.ec2_log_retention_in_days
   ecr_repository_names           = var.ecr_repository_names
 
   aws_region                     = var.aws_region
@@ -73,6 +74,8 @@ module "loadbalancer" {
   lb_deregistration_delay             = var.lb_deregistration_delay
   lb_cookie_duration                  = var.lb_cookie_duration
 
+  website_access_logs_bucket_name = module.s3_website_access_logs.s3_bucket_domain_name
+
   project_name = var.project_name
   environment  = var.environment
 }
@@ -124,6 +127,7 @@ module "elasticache" {
   cache_multi_az_enabled         = var.cache_multi_az_enabled
   cache_loglevel                 = var.cache_loglevel
   cache_log_group_name           = var.cache_log_group_name
+  cache_log_retention_in_days    = var.cache_log_retention_in_days
 
   project_name = var.project_name
   environment  = var.environment

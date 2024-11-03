@@ -133,6 +133,21 @@ variable "log_group_names" {
   default     = ["/var/log/spring-boot"]
 }
 
+variable "ec2_log_retention_in_days" {
+  description = "Number of days to keep EC2 logs in CloudWatch"
+  type        = number
+  default     = 90
+
+  validation {
+    condition     = tonumber(var.ec2_log_retention_in_days) == floor(var.ec2_log_retention_in_days)
+    error_message = "ec2_log_retention_in_days should be an integer!"
+  }
+  validation {
+    condition     = var.ec2_log_retention_in_days >= 0
+    error_message = "ec2_log_retention_in_days should be a positive integer!"
+  }
+}
+
 # ---------------- OS parameters --------------------
 
 variable "os" {

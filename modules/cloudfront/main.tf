@@ -39,12 +39,13 @@ resource "aws_cloudfront_distribution" "this" {
   logging_config {
     include_cookies = false
     bucket          = var.website_access_logs_bucket_name
-    prefix          = var.project_name
+    prefix          = join("-", [var.project_name, "cloudfront"])
   }
 
   viewer_certificate {
     acm_certificate_arn = aws_acm_certificate.www.arn
     ssl_support_method = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
   }
 
   tags = {

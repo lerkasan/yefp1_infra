@@ -111,6 +111,7 @@ resource "aws_cloudwatch_log_group" "logs" {
   for_each      = toset(var.log_group_names)
 
   name          = join("_", [var.project_name, var.log_group_names[index(var.log_group_names, each.value)]])
+  retention_in_days = var.ec2_log_retention_in_days
 
   tags          = {
     Name        = join("_", [var.project_name, "_log_group"])

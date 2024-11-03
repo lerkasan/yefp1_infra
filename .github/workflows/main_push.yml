@@ -1,0 +1,175 @@
+name: CI/CD for Infrastructure
+
+on:
+  push:
+    branches:
+      - main
+
+# for debugging purposes
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+  PROJECT_NAME: ${{ vars.PROJECT_NAME }}
+  TERRAFORM_VERSION: 1.9.8
+  TRIVY_DB_REPO: 'public.ecr.aws/aquasecurity/trivy-db:2'
+
+jobs:
+
+  validate:
+    name: Validate infrastructure code
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write       # For GitHub OIDC Token
+    steps:
+      - name: Checkout infrastructure code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683   #v4.2.2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502   # v4.0.2
+        with:
+          role-to-assume: ${{ secrets.TERRAFORM_ROLE }}
+          role-session-name: yefp1-infv-${{ github.sha }}-${{ github.run_id}}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform with specified version on the runner
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd   # v3.1.2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Terraform init
+        run: terraform init
+
+      - name: Terraform format
+        run: terraform fmt -check
+
+      - name: Retrieve a file with Terraform variables from SSM Parameter Store
+        run: aws ssm get-parameter --region "${AWS_REGION}" --name "${PROJECT_NAME}_terraform_values" --with-decryption --query Parameter.Value --output text > variables.auto.tfvars
+    
+      - name: Terraform validate
+        run: terraform validate -no-color
+
+      - name: Check for commited secrets using GitLeaks
+        uses: gitleaks/gitleaks-action@83373cf2f8c4db6e24b41c1a9b086bb9619e9cd3   #v2.3.7
+        env:
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: false
+
+      - name: Run Checkov action
+        id: checkov
+        uses: bridgecrewio/checkov-action@99bb2caf247dfd9f03cf984373bc6043d4e32ebf   #v12.1347.0
+        with:
+          directory: .
+          quiet: true
+          soft_fail: true
+          download_external_modules: false
+
+      - name: Run Trivy vulnerability scanner in fs mode
+        uses: aquasecurity/trivy-action@915b19bbe73b92a6cf82a1bc12b087c9a19a5fe2   #v0.28.0
+        with:
+          scan-type: 'config'
+          hide-progress: true
+        #   exit-code: '1'
+          ignore-unfixed: false
+          severity: 'CRITICAL,HIGH,MEDIUM'
+
+  plan:
+    name: Plan infrastructure
+    needs: [ validate ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write       # For GitHub OIDC Token
+    steps:
+      - name: Checkout infrastructure repository
+        uses: actions/checkout@98637d7db679cd12b4ae373378e391551b922539   # v3.5.3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502   # v4.0.2
+        with:
+          role-to-assume: ${{ secrets.TERRAFORM_ROLE }}
+          role-session-name: yefp1-infp-${{ github.sha }}-${{ github.run_id}}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Retrieve a file with Terraform variables from SSM Parameter Store
+        run: |
+          aws ssm get-parameter --region "${AWS_REGION}" --name "${PROJECT_NAME}_terraform_values" --with-decryption --query Parameter.Value --output text > variables.auto.tfvars
+          cp variables.auto.tfvars "$RUNNER_TEMP/variables.auto.tfvars"
+
+      - name: Setup Terraform with specified version on the runner
+        uses: hashicorp/setup-terraform@651471c36a6092792c552e8b1bef71e592b462d8   # v3.1.1
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Terraform init
+        run: terraform init
+
+      - name: Terraform plan Infrastructure
+        run: terraform plan -no-color -input=false -out tfplan.binary
+
+      - name: Upload Terraform plan as artifact
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882   #v4.4.3
+        with:
+          name: terraform-plan
+          path: tfplan.binary
+
+      - name: Setup Infracost
+        uses: infracost/actions/setup@d5dd739fb5eae81f31bf09fea5c290186a91964a   # v3.0.0
+        with:
+          api-key: ${{ secrets.INFRACOST_API_KEY }}
+
+      - name: Calculate difference in infrastructure cost introduced by pushed code
+        run: |
+          git checkout HEAD~1
+          cp "$RUNNER_TEMP/variables.auto.tfvars" variables.auto.tfvars
+          infracost breakdown --path . --format json --out-file "$RUNNER_TEMP/infracost-baseline.json"
+          git checkout HEAD
+          cp "$RUNNER_TEMP/variables.auto.tfvars" variables.auto.tfvars
+          infracost diff --path . --compare-to "$RUNNER_TEMP/infracost-baseline.json"
+
+      - name: Calculate total infrastructure cost
+        run: |
+          infracost breakdown --path .
+          infracost breakdown --path=. --format=json --out-file=infracost-total.json
+          infracost upload --path=infracost-total.json || echo "Always pass main branch runs even if there are policy failures
+
+  apply:
+    name: Provision infrastructure
+    needs: [ validate, plan ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write       # For GitHub OIDC Token
+    steps:
+      - name: Checkout infrastructure repository
+        uses: actions/checkout@98637d7db679cd12b4ae373378e391551b922539   # v3.5.3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502   # v4.0.2
+        with:
+          role-to-assume: ${{ secrets.TERRAFORM_ROLE }}
+          role-session-name: yefp1-infp-${{ github.sha }}-${{ github.run_id}}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Retrieve a file with Terraform variables from SSM Parameter Store
+        run: aws ssm get-parameter --region "${AWS_REGION}" --name "${PROJECT_NAME}_terraform_values" --with-decryption --query Parameter.Value --output text > variables.auto.tfvars
+
+      - name: Setup Terraform with specified version on the runner
+        uses: hashicorp/setup-terraform@651471c36a6092792c552e8b1bef71e592b462d8   # v3.1.1
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Terraform init
+        run: terraform init
+
+      - name: Download Terraform plan artifact
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16   #v4.1.8
+        with:
+          name: terraform-plan
+          path: tfplan.binary
+
+      - name: Terraform show planned changes to infrastructure
+        run: terraform show tfplan.binary
+
+      - name: Terraform apply changes to infrastructure
+        run: terraform apply -auto-approve -input=false tfplan.binary

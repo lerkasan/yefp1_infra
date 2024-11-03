@@ -19,8 +19,17 @@ data "aws_iam_policy_document" "allow_github_role_to_upload_to_s3" {
     effect  = "Allow"
     actions = [
       "s3:GetObject",
-      "s3:PutObject",
-	  "s3:ListBucket"
+      "s3:PutObject"
+    ]
+
+    resources = [ "${var.s3_bucket_arn}/*" ]
+  }
+
+    statement {
+    sid     = "AllowGithubRoleToListS3Bucket"
+    effect  = "Allow"
+    actions = [
+      "s3:ListBucket"
     ]
 
     resources = [ var.s3_bucket_arn ]
@@ -35,7 +44,7 @@ data "aws_iam_policy_document" "allow_github_role_to_create_cloudfront_invalidat
       "cloudfront:CreateInvalidation"
     ]
 
-    resources = [ aws_cloudfront_distribution.this.id ]
+    resources = [ aws_cloudfront_distribution.this.arn ]
   }
 }
 

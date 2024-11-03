@@ -166,3 +166,8 @@ variable "lb_cookie_duration" {
     error_message = "lb_cookie_durationshould be a positive integer!"
   }
 }
+
+variable "website_access_logs_bucket_name" {
+  description   = "Bucket name for website access logs "
+  type          = string
+}

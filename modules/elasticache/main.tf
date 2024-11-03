@@ -108,6 +108,7 @@ resource "aws_elasticache_parameter_group" "this" {
 
 resource "aws_cloudwatch_log_group" "slow_logs" {
   name          = join("_", [var.project_name, var.cache_log_group_name, "slow_logs"])
+  retention_in_days = var.cache_log_retention_in_days
 
   tags          = {
     Name        = join("_", [var.project_name, "_cache_slow_log_group"])
@@ -119,6 +120,8 @@ resource "aws_cloudwatch_log_group" "slow_logs" {
 
 resource "aws_cloudwatch_log_group" "engine_logs" {
   name          = join("_", [var.project_name, var.cache_log_group_name, "engine_logs"])
+  retention_in_days = var.cache_log_retention_in_days
+
 
   tags          = {
     Name        = join("_", [var.project_name, "_cache__engine_log_group"])

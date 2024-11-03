@@ -125,14 +125,14 @@ jobs:
         with:
           api-key: ${{ secrets.INFRACOST_API_KEY }}
 
-      - name: Calculate difference in infrastructure cost introduced by pushed code
-        run: |
-          git checkout HEAD~1
-          cp "$RUNNER_TEMP/variables.auto.tfvars" variables.auto.tfvars
-          infracost breakdown --path . --format json --out-file "$RUNNER_TEMP/infracost-baseline.json"
-          git checkout HEAD
-          cp "$RUNNER_TEMP/variables.auto.tfvars" variables.auto.tfvars
-          infracost diff --path . --compare-to "$RUNNER_TEMP/infracost-baseline.json"
+    #   - name: Calculate difference in infrastructure cost introduced by pushed code
+    #     run: |
+    #       git checkout HEAD~1
+    #       cp "$RUNNER_TEMP/variables.auto.tfvars" variables.auto.tfvars
+    #       infracost breakdown --path . --format json --out-file "$RUNNER_TEMP/infracost-baseline.json"
+    #       git checkout HEAD
+    #       cp "$RUNNER_TEMP/variables.auto.tfvars" variables.auto.tfvars
+    #       infracost diff --path . --compare-to "$RUNNER_TEMP/infracost-baseline.json"
 
       - name: Calculate total infrastructure cost
         run: |

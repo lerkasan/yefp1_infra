@@ -138,7 +138,7 @@ jobs:
         run: |
           infracost breakdown --path .
           infracost breakdown --path=. --format=json --out-file=infracost-total.json
-          infracost upload --path=infracost-total.json || echo "Always pass main branch runs even if there are policy failures
+          infracost upload --path=infracost-total.json || echo "Always pass main branch runs even if there are policy failures"
 
   apply:
     name: Provision infrastructure

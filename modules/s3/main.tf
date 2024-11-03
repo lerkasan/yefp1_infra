@@ -53,3 +53,10 @@ resource "aws_s3_bucket_website_configuration" "this" {
     suffix = "index.html"
   }
 }
+
+resource "aws_s3_bucket_policy" "allow_loadbalancer_to_write_logs" {
+  count  = var.is_alb_log_bucket ? 1 : 0
+
+  bucket = aws_s3_bucket.this.id
+  policy = data.aws_iam_policy_document.allow_elb_logging.json
+}

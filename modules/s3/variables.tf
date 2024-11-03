@@ -24,6 +24,13 @@ variable "is_website" {
   default = false
 }
 
+
+variable "is_alb_log_bucket" {
+  description = "Should S3 bucket be configured as a storage for load balancer access logs"
+  type    = bool
+  default = false
+}
+
 variable "s3_object_ownership" {
   description = "S3 object ownership (this parameter also enables/disables ACL)"
   type = string

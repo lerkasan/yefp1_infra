@@ -219,7 +219,7 @@ module "s3_website_access_logs" {
   source = "./modules/s3"
 
   bucket_name         = join("-", [var.project_name, "website-access-logs"])
-  is_website          = false
+  is_alb_log_bucket   = true
   s3_object_ownership = "BucketOwnerPreferred"
 
   project_name = var.project_name

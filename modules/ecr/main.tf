@@ -83,7 +83,7 @@ resource "aws_kms_key" "ecr_sign_key" {
   customer_master_key_spec = "RSA_4096"
   key_usage               = "SIGN_VERIFY"
   deletion_window_in_days = 10
-  enable_key_rotation     = true
+#   enable_key_rotation     = true
   policy = data.aws_iam_policy_document.ecr_sign_key_policy.json
 
   tags = {

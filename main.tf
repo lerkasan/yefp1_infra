@@ -74,7 +74,7 @@ module "loadbalancer" {
   lb_deregistration_delay             = var.lb_deregistration_delay
   lb_cookie_duration                  = var.lb_cookie_duration
 
-  website_access_logs_bucket_name = module.s3_website_access_logs.s3_bucket_domain_name
+  website_access_logs_bucket_name = module.s3_website_access_logs.s3_bucket_name
 
   project_name = var.project_name
   environment  = var.environment

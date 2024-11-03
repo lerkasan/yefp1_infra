@@ -13,6 +13,13 @@ env:
   PROJECT_NAME: ${{ vars.PROJECT_NAME }}
   TERRAFORM_VERSION: 1.9.8
   TRIVY_DB_REPO: 'public.ecr.aws/aquasecurity/trivy-db:2'
+  TF_VAR_ecr_user_name: ${{ secrets.ECR_USER_NAME }}
+  TF_VAR_database_name: ${{ secrets.DATABASE_NAME }}
+  TF_VAR_database_username: ${{ secrets.DATABASE_USERNAME }}
+  TF_VAR_database_password: ${{ secrets.DATABASE_PASSWORD }}
+  TF_VAR_cache_password: ${{ secrets.CACHE_PASSWORD }}
+  TF_VAR_django_api_secret_key: ${{ secrets.DJANGO_API_SECRET_KEY }}
+  TF_VAR_django_cache_secret_key: ${{ secrets.DJANGO_CACHE_SECRET_KEY }}
 
 jobs:
 

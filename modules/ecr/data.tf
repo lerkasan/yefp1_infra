@@ -13,14 +13,14 @@ data "aws_iam_policy_document" "ecr_sign_key_policy" {
       type        = "AWS"
       identifiers = [aws_iam_role.github_ecr_role.arn]
     }
-    resources = ["*"]
+    resources = [aws_kms_key.ecr_sign_key.arn]
   }
 
   statement {
     sid       = "AllowRootAllActionsOnKey"
     effect    = "Allow"
     actions   = ["kms:*"]
-    resources = ["*"]
+    resources = [aws_kms_key.ecr_sign_key.arn]
 
     principals {
       type        = "AWS"

@@ -6,7 +6,7 @@ resource "aws_subnet" "public" {
   vpc_id                  = aws_vpc.this.id
   availability_zone       = each.value
   cidr_block              = var.public_subnets[index(local.availability_zones, each.value)]
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = false
 
   tags = {
     Name        = join("_", [var.project_name, "_public_subnet"])
@@ -44,9 +44,9 @@ resource "aws_route_table" "public" {
 }
 
 resource "aws_route_table_association" "public" {
-  for_each        = aws_subnet.public
+  for_each = aws_subnet.public
 
-  subnet_id       = each.value.id
-  route_table_id  = aws_route_table.public.id
+  subnet_id      = each.value.id
+  route_table_id = aws_route_table.public.id
 }
 

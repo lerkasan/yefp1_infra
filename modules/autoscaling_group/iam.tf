@@ -4,8 +4,8 @@ resource "aws_iam_instance_profile" "this" {
 }
 
 resource "aws_iam_role" "appserver_iam_role" {
-  name        = join("", [title(var.project_name), "AppserverRole"])
-  description = "The role for EC2 instances for appserver"
+  name               = join("", [title(var.project_name), "AppserverRole"])
+  description        = "The role for EC2 instances for appserver"
   assume_role_policy = data.aws_iam_policy_document.assume_role_ec2.json
 }
 

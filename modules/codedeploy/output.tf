@@ -9,6 +9,6 @@ output "deployment_group_name" {
 }
 
 output "codedeploy_application_name" {
-  value = aws_codedeploy_app.this.name
+  value       = aws_codedeploy_app.this.name
   description = "CodeDeploy application name"
 }

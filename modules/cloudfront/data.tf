@@ -15,36 +15,36 @@ data "aws_route53_zone" "this" {
 
 data "aws_iam_policy_document" "allow_github_role_to_upload_to_s3" {
   statement {
-    sid     = "AllowGithubRoleToUploadToS3"
-    effect  = "Allow"
+    sid    = "AllowGithubRoleToUploadToS3"
+    effect = "Allow"
     actions = [
       "s3:GetObject",
       "s3:PutObject"
     ]
 
-    resources = [ "${var.s3_bucket_arn}/*" ]
+    resources = ["${var.s3_bucket_arn}/*"]
   }
 
-    statement {
-    sid     = "AllowGithubRoleToListS3Bucket"
-    effect  = "Allow"
+  statement {
+    sid    = "AllowGithubRoleToListS3Bucket"
+    effect = "Allow"
     actions = [
       "s3:ListBucket"
     ]
 
-    resources = [ var.s3_bucket_arn ]
+    resources = [var.s3_bucket_arn]
   }
 }
 
 data "aws_iam_policy_document" "allow_github_role_to_create_cloudfront_invalidation" {
   statement {
-    sid     = "AllowGithubRoleToCreateCloudFrontInvalidation"
-    effect  = "Allow"
+    sid    = "AllowGithubRoleToCreateCloudFrontInvalidation"
+    effect = "Allow"
     actions = [
       "cloudfront:CreateInvalidation"
     ]
 
-    resources = [ aws_cloudfront_distribution.this.arn ]
+    resources = [aws_cloudfront_distribution.this.arn]
   }
 }
 
@@ -53,12 +53,12 @@ data "aws_iam_policy_document" "trust_policy_for_github_roles" {
     for_each = toset(var.github_repositories)
 
     content {
-    #   sid     = "TrustPolicyForGithubECRRole"
+      #   sid     = "TrustPolicyForGithubECRRole"
       effect  = "Allow"
       actions = ["sts:AssumeRoleWithWebIdentity"]
 
       principals {
-        type = "Federated"
+        type        = "Federated"
         identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.id}:oidc-provider/token.actions.githubusercontent.com"]
       }
 
@@ -68,12 +68,12 @@ data "aws_iam_policy_document" "trust_policy_for_github_roles" {
         values   = ["sts.amazonaws.com"]
       }
 
-# https://github.com/aws-actions/configure-aws-credentials/issues/1137#issuecomment-2308716791
-# https://github.com/aws-actions/configure-aws-credentials/issues/1137#issuecomment-2305041118
+      # https://github.com/aws-actions/configure-aws-credentials/issues/1137#issuecomment-2308716791
+      # https://github.com/aws-actions/configure-aws-credentials/issues/1137#issuecomment-2305041118
       condition {
         test     = "StringLike"
         variable = "token.actions.githubusercontent.com:sub"
-        values   = [
+        values = [
           "repo:${statement.value}:*"
         ]
       }

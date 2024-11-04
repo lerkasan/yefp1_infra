@@ -1,25 +1,25 @@
 module "ecr_user" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-user?ref=cfb6845f1fb0cf34438b640bd69ee81f7b38332f"   # commit hash for version 5.47.1	
-#   source  = "terraform-aws-modules/iam/aws//modules/iam-user"
-#   version = "5.47.1"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-user?ref=cfb6845f1fb0cf34438b640bd69ee81f7b38332f" # commit hash for version 5.47.1	
+  #   source  = "terraform-aws-modules/iam/aws//modules/iam-user"
+  #   version = "5.47.1"
 
   name                          = var.ecr_user_name
   create_iam_access_key         = false
   create_iam_user_login_profile = false
 
-  policy_arns = [ 
+  policy_arns = [
     module.allow_push_to_ecr_iam_policy.arn
   ]
 }
 
 module "allow_push_to_ecr_iam_policy" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-policy?ref=cfb6845f1fb0cf34438b640bd69ee81f7b38332f"   # commit hash for version 5.47.1	
-#   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-#   version = "5.47.1"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git//modules/iam-policy?ref=cfb6845f1fb0cf34438b640bd69ee81f7b38332f" # commit hash for version 5.47.1	
+  #   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  #   version = "5.47.1"
 
-  name    = "allow-full-access-to-ecr"
+  name = "allow-full-access-to-ecr"
 
-  policy  = jsonencode({
+  policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
@@ -45,11 +45,11 @@ module "allow_push_to_ecr_iam_policy" {
           "ecr:InitiateLayerUpload",
           "ecr:CompleteLayerUpload"
         ]
-        Resource = [for repo_name in var.ecr_repository_names: "arn:aws:ecr:${var.aws_region}:${data.aws_caller_identity.current.id}:repository/${repo_name}"]
+        Resource = [for repo_name in var.ecr_repository_names : "arn:aws:ecr:${var.aws_region}:${data.aws_caller_identity.current.id}:repository/${repo_name}"]
       },
       {
-        Effect = "Allow"
-        Action = [ "ecr:GetAuthorizationToken" ]
+        Effect   = "Allow"
+        Action   = ["ecr:GetAuthorizationToken"]
         Resource = "*"
       }
     ]
@@ -59,7 +59,7 @@ module "allow_push_to_ecr_iam_policy" {
 resource "aws_iam_role" "github_ecr_role" {
   name        = join("", [title(var.project_name), "github_ecr_role"])
   description = "The role for Github Actions to sign docker images and push them to ECR"
-#   assume_role_policy = data.aws_iam_policy_document.assume_role_ec2.json
+  #   assume_role_policy = data.aws_iam_policy_document.assume_role_ec2.json
   assume_role_policy = data.aws_iam_policy_document.trust_policy_for_github_roles.json
 
   tags = {
@@ -73,7 +73,7 @@ resource "aws_iam_role" "github_ecr_role" {
 resource "aws_iam_role" "github_codedeploy_role" {
   name        = join("", [title(var.project_name), "github_codedeploy_role"])
   description = "The role for Github Actions to deploy backend via CodeDeploy"
-#   assume_role_policy = data.aws_iam_policy_document.assume_role_ec2.json
+  #   assume_role_policy = data.aws_iam_policy_document.assume_role_ec2.json
   assume_role_policy = data.aws_iam_policy_document.trust_policy_for_github_roles.json
 
   tags = {

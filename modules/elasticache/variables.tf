@@ -1,14 +1,14 @@
 # ---------------- General parameters ----------------
 
 variable "project_name" {
-  description   = "Project name"
-  type          = string
+  description = "Project name"
+  type        = string
 }
 
 variable "environment" {
-  description   = "Environment: dev/stage/prod"
-  type          = string
-  default       = "stage"
+  description = "Environment: dev/stage/prod"
+  type        = string
+  default     = "stage"
 }
 
 # -------------- Network parameters ---------------
@@ -21,19 +21,19 @@ variable "private_subnets_ids" {
 # --------------- Cache parameters
 
 variable "cache_replication_group_name" {
-  description   = "Cache replication group name"
-  type          = string
+  description = "Cache replication group name"
+  type        = string
 }
 
 variable "cache_parameter_group_name" {
-  description   = "Cache name"
-  type          = string
+  description = "Cache name"
+  type        = string
 }
 
 variable "cache_parameter_group_family" {
-  description   = "Parameter group family"
-  type          = string
-  default = "redis7"
+  description = "Parameter group family"
+  type        = string
+  default     = "redis7"
 
   validation {
     condition     = contains(["redis2.6", "redis2.8", "redis3.2", "redis4.0", "redis5.0", "redis6.x", "redis7"], var.cache_parameter_group_family)
@@ -53,31 +53,31 @@ variable "cache_password" {
 }
 
 variable "cache_node_type" {
-  description   = "Cache node type"
-  type          = string
-#   default = "cache.t3.micro"
+  description = "Cache node type"
+  type        = string
+  #   default = "cache.t3.micro"
 }
 
 variable "num_cache_clusters" {
-  description   = "Num cache clusters"
-  type          = number
-  default = 2
+  description = "Num cache clusters"
+  type        = number
+  default     = 2
 
   validation {
-    condition = tonumber(var.num_cache_clusters) == floor(var.num_cache_clusters)
+    condition     = tonumber(var.num_cache_clusters) == floor(var.num_cache_clusters)
     error_message = "num_cache_clusters should be an integer."
   }
 
   validation {
-    condition = var.num_cache_clusters >= 2
+    condition     = var.num_cache_clusters >= 2
     error_message = "num_cache_clusters should be greater or equal 2."
   }
 }
 
 variable "cache_engine" {
-  description   = "Cache engine"
-  type          = string
-  default = "redis"
+  description = "Cache engine"
+  type        = string
+  default     = "redis"
 
   validation {
     condition     = contains(["redis", "valkey"], var.cache_engine)
@@ -87,18 +87,18 @@ variable "cache_engine" {
 
 variable "cache_engine_version" {
   description = "Cache engine version"
-  type = string
+  type        = string
 }
 
 variable "cache_port" {
   description = "Cache port"
-  type = number
-  default = 6379
+  type        = number
+  default     = 6379
 }
 
 variable "cache_security_group_id" {
   description = "Cache security group id"
-  type = string
+  type        = string
 }
 
 variable "cache_maintenance_window" {
@@ -110,20 +110,20 @@ variable "cache_maintenance_window" {
 variable "cache_snapshot_window" {
   description = "cache snapshot window"
   type        = string
-  default = "05:00-09:00"
+  default     = "05:00-09:00"
 }
 
 variable "cache_snapshot_retention_limit" {
   description = "cache snapshot retention limit"
-  type          = number
+  type        = number
 
   validation {
-    condition = tonumber(var.cache_snapshot_retention_limit) == floor(var.cache_snapshot_retention_limit)
+    condition     = tonumber(var.cache_snapshot_retention_limit) == floor(var.cache_snapshot_retention_limit)
     error_message = "cache_snapshot_retention_limit should be an integer."
   }
 
   validation {
-    condition = var.cache_snapshot_retention_limit >= 0
+    condition     = var.cache_snapshot_retention_limit >= 0
     error_message = "cache_snapshot_retention_limit should be greater or equal 0"
   }
 }
@@ -137,7 +137,7 @@ variable "cache_multi_az_enabled" {
 variable "cache_loglevel" {
   description = "cache log level"
   type        = string
-  default = "notice"
+  default     = "notice"
 
   validation {
     condition     = contains(["debug", "verbose", "notice", "warning", "nothing"], var.cache_loglevel)

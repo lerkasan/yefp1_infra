@@ -1,11 +1,12 @@
 # ----------------  PRIVATE NETWORK -----------------
 
 resource "aws_subnet" "private" {
-  for_each                = toset(local.availability_zones)
+  for_each = toset(local.availability_zones)
 
   vpc_id                  = aws_vpc.this.id
   availability_zone       = each.value
   cidr_block              = var.private_subnets[index(local.availability_zones, each.value)]
+  map_public_ip_on_launch = false
 
   tags = {
     Name        = join("_", [var.project_name, "_private_subnet"])
@@ -16,9 +17,9 @@ resource "aws_subnet" "private" {
 }
 
 resource "aws_eip" "this" {
-  for_each   = aws_subnet.public
+  for_each = aws_subnet.public
 
-  domain     = "vpc"
+  domain = "vpc"
 
   tags = {
     Name        = join("_", [var.project_name, "_nat_gw_eip"])
@@ -29,7 +30,7 @@ resource "aws_eip" "this" {
 }
 
 resource "aws_nat_gateway" "this" {
-  for_each          = aws_subnet.public
+  for_each = aws_subnet.public
 
   connectivity_type = "public"
   subnet_id         = aws_subnet.public[each.key].id
@@ -44,12 +45,12 @@ resource "aws_nat_gateway" "this" {
 }
 
 resource "aws_route_table" "private" {
-  for_each     = aws_nat_gateway.this
+  for_each = aws_nat_gateway.this
 
-  vpc_id       = aws_vpc.this.id
+  vpc_id = aws_vpc.this.id
 
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block     = "0.0.0.0/0"
     nat_gateway_id = each.value.id
   }
 
@@ -62,7 +63,7 @@ resource "aws_route_table" "private" {
 }
 
 resource "aws_route_table_association" "private" {
-  for_each       = aws_subnet.private
+  for_each = aws_subnet.private
 
   subnet_id      = each.value.id
   route_table_id = aws_route_table.private[each.key].id

@@ -1,20 +1,20 @@
 # ---------------- General parameters ----------------
 
 variable "project_name" {
-  description   = "Project name"
-  type          = string
+  description = "Project name"
+  type        = string
 }
 
 variable "environment" {
-  description   = "Environment: dev/stage/prod"
-  type          = string
-  default       = "stage"
+  description = "Environment: dev/stage/prod"
+  type        = string
+  default     = "stage"
 }
 
 variable "aws_region" {
-  description   = "AWS region"
-  type          = string
-  default       = "us-east-1"
+  description = "AWS region"
+  type        = string
+  default     = "us-east-1"
 }
 
 # ---------------- Autoscaling parameters --------------
@@ -49,11 +49,11 @@ variable "autoscale_estimated_instance_warmup" {
   default     = 300
 
   validation {
-    condition = tonumber(var.autoscale_estimated_instance_warmup) == floor(var.autoscale_estimated_instance_warmup)
+    condition     = tonumber(var.autoscale_estimated_instance_warmup) == floor(var.autoscale_estimated_instance_warmup)
     error_message = "autoscale_estimated_instance_warmup should be an integer!"
   }
   validation {
-    condition = var.autoscale_estimated_instance_warmup >= 0
+    condition     = var.autoscale_estimated_instance_warmup >= 0
     error_message = "autoscale_estimated_instance_warmup should be a positive integer!"
   }
 }
@@ -64,12 +64,12 @@ variable "autoscale_avg_cpu_utilization_target" {
   default     = 60.0
 
   validation {
-    condition = var.autoscale_avg_cpu_utilization_target >= 40
+    condition     = var.autoscale_avg_cpu_utilization_target >= 40
     error_message = "autoscale_avg_cpu_utilization_target should be more or equal to 40."
   }
 
   validation {
-    condition = var.autoscale_avg_cpu_utilization_target <= 80
+    condition     = var.autoscale_avg_cpu_utilization_target <= 80
     error_message = "autoscale_avg_cpu_utilization_target should be less or equal to 80."
   }
 }
@@ -94,13 +94,13 @@ variable "ec2_instance_type" {
   default     = "t3.micro"
 }
 
-variable ebs_volume_type {
+variable "ebs_volume_type" {
   description = "EC2 instance EBS volume type"
   type        = string
   default     = "gp3"
 }
 
-variable ebs_volume_size {
+variable "ebs_volume_size" {
   description = "EC2 instance EBS volume size"
   type        = number
   default     = 10
@@ -116,10 +116,10 @@ variable "appserver_private_ssh_key_name" {
 variable "admin_public_ssh_keys" {
   description = "List of names of the SSM parameters with admin public ssh keys"
   type        = list(string)
-  default     = [ "admin_public_ssh_key", "lerkasan_ssh_public_key_bastion" ]
+  default     = ["admin_public_ssh_key", "lerkasan_ssh_public_key_bastion"]
 }
 
-variable monitoring_enabled {
+variable "monitoring_enabled" {
   description = "EC2 instance monitoring"
   type        = bool
   default     = true
@@ -177,8 +177,8 @@ variable "os_version" {
 variable "os_releases" {
   description = "OS release"
   type        = map(string)
-  default     = {
-    "22.04"   = "jammy"
+  default = {
+    "22.04" = "jammy"
   }
 }
 
@@ -193,16 +193,16 @@ variable "ami_virtualization" {
 variable "ami_architectures" {
   description = "AMI architecture filters"
   type        = map(string)
-  default     = {
-    "amd64"   = "x86_64"
+  default = {
+    "amd64" = "x86_64"
   }
 }
 
 variable "ami_owner_ids" {
   description = "AMI owner id"
   type        = map(string)
-  default     = {
-    "ubuntu"  = "099720109477" #Canonical
+  default = {
+    "ubuntu" = "099720109477" #Canonical
   }
 }
 
@@ -282,13 +282,13 @@ variable "ec2_connect_endpoint_sg_id" {
 variable "alb_target_group_arns" {
   description = "A target group arn of a load balancer"
   type        = list(string)
-  default = []
+  default     = []
 }
 
 # ------------------ ECR parameters ---------------------
 
 variable "ecr_repository_names" {
-  description   = "ECR repository names"
-  type          = list(string)
-  default       = []
+  description = "ECR repository names"
+  type        = list(string)
+  default     = []
 }

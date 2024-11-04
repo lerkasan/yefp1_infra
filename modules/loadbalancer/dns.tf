@@ -23,9 +23,9 @@ resource "aws_route53_record" "this" {
 
 resource "aws_route53_record" "api" {
   zone_id = data.aws_route53_zone.this.zone_id
-#   zone_id = aws_route53_zone.api.zone_id
-  name    = local.api_domain_name
-  type    = "A"
+  #   zone_id = aws_route53_zone.api.zone_id
+  name = local.api_domain_name
+  type = "A"
 
   alias {
     name                   = aws_lb.app.dns_name
@@ -47,9 +47,9 @@ resource "aws_route53_record" "api" {
 
 resource "aws_route53_record" "cache" {
   zone_id = data.aws_route53_zone.this.zone_id
-#   zone_id = aws_route53_zone.cache.zone_id
-  name    = local.cache_domain_name
-  type    = "A"
+  #   zone_id = aws_route53_zone.cache.zone_id
+  name = local.cache_domain_name
+  type = "A"
 
   alias {
     name                   = aws_lb.app.dns_name

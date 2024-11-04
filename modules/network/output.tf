@@ -1,9 +1,9 @@
 output "private_subnets_ids" {
-  value       = [ for az in toset(local.availability_zones) : aws_subnet.private[az].id]
+  value = [for az in toset(local.availability_zones) : aws_subnet.private[az].id]
 }
 
 output "public_subnets_ids" {
-  value       = [ for az in toset(local.availability_zones) : aws_subnet.public[az].id]
+  value = [for az in toset(local.availability_zones) : aws_subnet.public[az].id]
 }
 
 output "vpc_id" {
@@ -17,6 +17,6 @@ output "internet_gateway_id" {
 }
 
 output "nat_gateway_ids" {
-  value       = [ for az in toset(local.availability_zones)  : aws_nat_gateway.this[az].id ]
+  value       = [for az in toset(local.availability_zones) : aws_nat_gateway.this[az].id]
   description = "NAT gateway ids"
 }

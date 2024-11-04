@@ -1,21 +1,21 @@
 # ---------------- General parameters ----------------
 
 variable "project_name" {
-  description   = "Project name"
-  type          = string
-  default       = "boanerges"
+  description = "Project name"
+  type        = string
+  default     = "boanerges"
 }
 
 variable "environment" {
-  description   = "Environment: dev/stage/prod"
-  type          = string
-  default       = "stage"
+  description = "Environment: dev/stage/prod"
+  type        = string
+  default     = "stage"
 }
 
 variable "aws_region" {
-  description   = "AWS region"
-  type          = string
-  default       = "us-east-1"
+  description = "AWS region"
+  type        = string
+  default     = "us-east-1"
 }
 
 # ---------------- VPC parameters ----------------
@@ -34,18 +34,18 @@ variable "cidr_block" {
 variable "public_subnets" {
   description = "A list of public subnets inside the VPC"
   type        = list(string)
-  default     = [ "10.0.10.0/24", "10.0.20.0/24" ]
+  default     = ["10.0.10.0/24", "10.0.20.0/24"]
 }
 
 variable "private_subnets" {
   description = "A list of private subnets inside the VPC"
   type        = list(string)
-  default     = [ "10.0.240.0/24", "10.0.250.0/24" ]
+  default     = ["10.0.240.0/24", "10.0.250.0/24"]
 }
 
 variable "vpc_endpoints_sg_id" {
-  description   = "An id of a security group for VPC Endpoints"
-  type          = string
+  description = "An id of a security group for VPC Endpoints"
+  type        = string
 }
 
 

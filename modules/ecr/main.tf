@@ -1,9 +1,9 @@
 module "ecr_repository" {
   for_each = toset(var.ecr_repository_names)
-  
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-ecr.git?ref=841b3c7d4b15adaca3dfc7a49f41c70ae03dd17b"   # commit hash for version 2.3.0
-#   source  = "terraform-aws-modules/ecr/aws"
-#   version = "2.3.0"
+
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-ecr.git?ref=841b3c7d4b15adaca3dfc7a49f41c70ae03dd17b" # commit hash for version 2.3.0
+  #   source  = "terraform-aws-modules/ecr/aws"
+  #   version = "2.3.0"
 
   repository_name = each.key
   repository_type = var.ecr_repository_type
@@ -29,8 +29,8 @@ module "ecr_repository" {
   })
 
   repository_policy = jsonencode({
-	Version   = "2012-10-17"
-	Statement = [
+    Version = "2012-10-17"
+    Statement = [
       {
         Action = [
           "ecr:ListTagsForResource",
@@ -59,14 +59,14 @@ module "ecr_repository" {
           "ecr:InitiateLayerUpload",
           "ecr:CompleteLayerUpload",
         ]
-        Effect    = "Allow"
+        Effect = "Allow"
         Principal = {
           AWS = "arn:aws:iam::${data.aws_caller_identity.current.id}:user/${module.ecr_user.iam_user_name}"
         }
         Sid = "ReadWrite"
       },
     ]
-})
+  })
 
   registry_scan_type = var.ecr_repository_scan_type
 
@@ -79,11 +79,11 @@ module "ecr_repository" {
 }
 
 resource "aws_kms_key" "ecr_sign_key" {
-  description             = "A key to sign docker images in ECR"
+  description              = "A key to sign docker images in ECR"
   customer_master_key_spec = "RSA_4096"
-  key_usage               = "SIGN_VERIFY"
-  deletion_window_in_days = 10
-#   enable_key_rotation     = true
+  key_usage                = "SIGN_VERIFY"
+  deletion_window_in_days  = 10
+  #   enable_key_rotation     = true
   policy = data.aws_iam_policy_document.ecr_sign_key_policy.json
 
   tags = {

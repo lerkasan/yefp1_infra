@@ -1,11 +1,12 @@
 resource "aws_lb" "app" {
-  name               = var.lb_name
-  internal           = var.lb_internal
-  load_balancer_type = var.lb_type
-  security_groups    = [ var.lb_sg_id ]
-  subnets            = var.public_subnets_ids
-  drop_invalid_header_fields = true
-#   enable_deletion_protection = true
+  name                             = var.lb_name
+  internal                         = var.lb_internal
+  load_balancer_type               = var.lb_type
+  security_groups                  = [var.lb_sg_id]
+  subnets                          = var.public_subnets_ids
+  drop_invalid_header_fields       = true
+  enable_cross_zone_load_balancing = true # For application load balancer this feature is always enabled (true) and cannot be disabled
+  #   enable_deletion_protection = true
 
   access_logs {
     bucket  = var.website_access_logs_bucket_name
@@ -22,17 +23,17 @@ resource "aws_lb" "app" {
 }
 
 resource "aws_lb_target_group" "backend_rds_app" {
-  name     = join("-", [var.project_name, "-app-tg"])
-#   name     = join("-", [var.project_name, "backend-rds-app-tg"])
-  port     = local.backend_rds_app_port
-  protocol = "HTTP"
-  vpc_id   = var.vpc_id
+  name = join("-", [var.project_name, "-app-tg"])
+  #   name     = join("-", [var.project_name, "backend-rds-app-tg"])
+  port                 = local.backend_rds_app_port
+  protocol             = "HTTP"
+  vpc_id               = var.vpc_id
   deregistration_delay = var.lb_deregistration_delay
 
   health_check {
     healthy_threshold   = var.lb_health_check_healthy_threshold
     interval            = var.lb_health_check_interval
-    matcher              = "200"
+    matcher             = "200"
     path                = var.lb_health_check_path
     protocol            = "HTTP"
     timeout             = var.lb_health_check_timeout
@@ -45,7 +46,7 @@ resource "aws_lb_target_group" "backend_rds_app" {
   }
 
   tags = {
-    Name        = join("_", [var.project_name, "_app_tg"])
+    Name = join("_", [var.project_name, "_app_tg"])
     # Name        = join("_", [var.project_name, "backend_rds_app_tg"])
     terraform   = "true"
     environment = var.environment
@@ -54,16 +55,16 @@ resource "aws_lb_target_group" "backend_rds_app" {
 }
 
 resource "aws_lb_target_group" "backend_redis_app" {
-  name     = join("-", [var.project_name, "-backend-redis-app-tg"])
-  port     = local.backend_redis_app_port
-  protocol = "HTTP"
-  vpc_id   = var.vpc_id
+  name                 = join("-", [var.project_name, "-backend-redis-app-tg"])
+  port                 = local.backend_redis_app_port
+  protocol             = "HTTP"
+  vpc_id               = var.vpc_id
   deregistration_delay = var.lb_deregistration_delay
 
   health_check {
     healthy_threshold   = var.lb_health_check_healthy_threshold
     interval            = var.lb_health_check_interval
-    matcher              = "200"
+    matcher             = "200"
     path                = var.lb_health_check_path
     protocol            = "HTTP"
     timeout             = var.lb_health_check_timeout
@@ -113,20 +114,20 @@ resource "aws_lb_listener" "https" {
   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = data.aws_acm_certificate.this.arn
 
-#   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.app.arn
-#   }
+  #   default_action {
+  #     type             = "forward"
+  #     target_group_arn = aws_lb_target_group.app.arn
+  #   }
 
-#   default_action {
-#     type = "fixed-response"
+  #   default_action {
+  #     type = "fixed-response"
 
-#     fixed_response {
-#       content_type = "text/plain"
-#       message_body = "OK"
-#       status_code  = "200"
-#     }
-#   }
+  #     fixed_response {
+  #       content_type = "text/plain"
+  #       message_body = "OK"
+  #       status_code  = "200"
+  #     }
+  #   }
 
   default_action {
     type = "redirect"
@@ -176,11 +177,11 @@ resource "aws_lb_listener_rule" "backend_rds" {
     target_group_arn = aws_lb_target_group.backend_rds_app.arn
   }
 
-#   condition {
-#     path_pattern {
-#       values = ["/api/*"]
-#     }
-#   }
+  #   condition {
+  #     path_pattern {
+  #       values = ["/api/*"]
+  #     }
+  #   }
 
   condition {
     host_header {
@@ -205,11 +206,11 @@ resource "aws_lb_listener_rule" "backend_redis" {
     target_group_arn = aws_lb_target_group.backend_redis_app.arn
   }
 
-#   condition {
-#     path_pattern {
-#       values = ["/cache/*"]
-#     }
-#   }
+  #   condition {
+  #     path_pattern {
+  #       values = ["/cache/*"]
+  #     }
+  #   }
 
   condition {
     host_header {

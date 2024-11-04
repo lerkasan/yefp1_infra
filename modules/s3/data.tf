@@ -1,17 +1,17 @@
 data "aws_elb_service_account" "main" {}
 
 data "aws_iam_policy_document" "allow_cloudfront_access_only" {
-    statement {
-      sid       = "AllowCloudFrontServicePrincipalReadOnly"
-      effect    = "Allow"
-      actions   = ["s3:GetObject"]
+  statement {
+    sid     = "AllowCloudFrontServicePrincipalReadOnly"
+    effect  = "Allow"
+    actions = ["s3:GetObject"]
 
-      principals {
-        type        = "Service"
-        identifiers = ["cloudfront.amazonaws.com"]
-      }
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
 
-      resources = ["${aws_s3_bucket.this.arn}/*"]
+    resources = ["${aws_s3_bucket.this.arn}/*"]
 
     condition {
       test     = "StringEquals"
@@ -23,9 +23,9 @@ data "aws_iam_policy_document" "allow_cloudfront_access_only" {
 
 data "aws_iam_policy_document" "allow_elb_logging" {
   statement {
-    sid       = "AllowLoadBalancerWriteOnly"
-    effect = "Allow"
-    actions   = ["s3:PutObject"]
+    sid     = "AllowLoadBalancerWriteOnly"
+    effect  = "Allow"
+    actions = ["s3:PutObject"]
 
     principals {
       type        = "AWS"

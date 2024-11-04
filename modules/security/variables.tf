@@ -1,14 +1,14 @@
 # ---------------- General parameters ----------------
 
 variable "project_name" {
-  description   = "Project name"
-  type          = string
+  description = "Project name"
+  type        = string
 }
 
 variable "environment" {
-  description   = "Environment: dev/stage/prod"
-  type          = string
-  default       = "stage"
+  description = "Environment: dev/stage/prod"
+  type        = string
+  default     = "stage"
 }
 
 # ---------------- Network parameters -------------------

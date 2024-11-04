@@ -1,5 +1,5 @@
 resource "aws_iam_role" "github_cloudfront_role" {
-  name        = join("", [title(var.project_name), "github_cloudfront_role"])
+  name               = join("", [title(var.project_name), "github_cloudfront_role"])
   assume_role_policy = data.aws_iam_policy_document.trust_policy_for_github_roles.json
 }
 

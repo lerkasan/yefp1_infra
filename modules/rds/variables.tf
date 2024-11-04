@@ -1,14 +1,14 @@
 # ---------------- General parameters ----------------
 
 variable "project_name" {
-  description   = "Project name"
-  type          = string
+  description = "Project name"
+  type        = string
 }
 
 variable "environment" {
-  description   = "Environment: dev/stage/prod"
-  type          = string
-  default       = "stage"
+  description = "Environment: dev/stage/prod"
+  type        = string
+  default     = "stage"
 }
 
 # -------------- Database access parameters ---------------
@@ -37,31 +37,31 @@ variable "database_instance_class" {
   default     = "db.t3.micro"
 }
 
-variable database_storage_type {
+variable "database_storage_type" {
   description = "database storage type"
   type        = string
   default     = "gp3"
 }
 
-variable database_allocated_storage {
+variable "database_allocated_storage" {
   description = "database allocated storage size in GB"
   type        = number
   default     = 10
 }
 
-variable database_max_allocated_storage {
+variable "database_max_allocated_storage" {
   description = "database max allocated storage size in GB"
   type        = number
   default     = 20
 }
 
-variable database_backup_retention_period {
+variable "database_backup_retention_period" {
   description = "database backup retention period in days"
   type        = number
   default     = 30
 }
 
-variable database_maintenance_window {
+variable "database_maintenance_window" {
   description = "database maintenance window"
   type        = string
   default     = "Sun:02:00-Sun:04:00"

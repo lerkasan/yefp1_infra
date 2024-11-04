@@ -53,7 +53,6 @@ data "aws_iam_policy_document" "trust_policy_for_github_roles" {
     for_each = toset(var.github_repositories)
 
     content {
-      #   sid     = "TrustPolicyForGithubECRRole"
       effect  = "Allow"
       actions = ["sts:AssumeRoleWithWebIdentity"]
 

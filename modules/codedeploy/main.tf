@@ -31,20 +31,6 @@ resource "aws_codedeploy_deployment_group" "this" {
     events  = ["DEPLOYMENT_FAILURE"]
   }
 
-  #   ec2_tag_set {
-  #     ec2_tag_filter {
-  #       key   = "Name"
-  #       type  = "KEY_AND_VALUE"
-  #       value = join("_", [var.project_name, "_appserver_autoscaling"])
-  #     }
-
-  #     ec2_tag_filter {
-  #       key   = "project"
-  #       type  = "KEY_AND_VALUE"
-  #       value = var.project_name
-  #     }
-  #   }
-
   tags = {
     Name      = join("_", [var.project_name, "_appserver"])
     terraform = "true"

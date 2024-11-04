@@ -74,6 +74,8 @@ module "loadbalancer" {
   lb_deregistration_delay             = var.lb_deregistration_delay
   lb_cookie_duration                  = var.lb_cookie_duration
 
+  # S3 bucket policy that allows AWS loadbalancer service to write access logs into a bucket should already exist before creating a loadbalancer.
+  # While creating the loadbalancer, AWS will attempt to write test sample of logs into the bucket. If a bucket policy hasn't been created yet than the loadbalancer creation will fail.
   website_access_logs_bucket_name = module.s3_website_access_logs.s3_bucket_name
 
   project_name = var.project_name
@@ -182,7 +184,7 @@ module "security" {
 
   vpc_id               = module.network.vpc_id
   private_subnet_cidrs = local.private_subnet_cidrs
-  #   admin_public_ip      = var.admin_public_ip
+  #   admin_ip      = var.admin_ip   # Infrastructure doesn't create a bastion. Uncomment if the bastion is added
 
   project_name = var.project_name
   environment  = var.environment

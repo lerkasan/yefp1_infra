@@ -8,6 +8,8 @@ resource "aws_autoscaling_group" "appserver" {
   target_group_arns         = var.alb_target_group_arns
   vpc_zone_identifier       = var.private_subnets_ids
 
+  # default_instance_warmup is commented because it makes CodeDeploy BlockTraffic and AllowTraffic last 10 minutes each additionally to time configured in ALB healthchecks.
+  # CodeDeploy BlockTraffic and AllowTraffic hooks wait for total amount of time that equals time of several attempts of ALB healthchecks.
   #  default_instance_warmup     = 300
 
   launch_template {
@@ -88,13 +90,13 @@ resource "aws_autoscaling_policy" "avg_cpu_utilization" {
   autoscaling_group_name    = aws_autoscaling_group.appserver.name
   adjustment_type           = "ChangeInCapacity"
   policy_type               = "TargetTrackingScaling"
-  estimated_instance_warmup = var.autoscale_estimated_instance_warmup #600
+  estimated_instance_warmup = var.autoscale_estimated_instance_warmup
 
   target_tracking_configuration {
     predefined_metric_specification {
       predefined_metric_type = "ASGAverageCPUUtilization"
     }
-    target_value = var.autoscale_avg_cpu_utilization_target #60.0
+    target_value = var.autoscale_avg_cpu_utilization_target
   }
 }
 

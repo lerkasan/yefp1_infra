@@ -13,14 +13,20 @@ data "aws_iam_policy_document" "ecr_sign_key_policy" {
       type        = "AWS"
       identifiers = [aws_iam_role.github_ecr_role.arn]
     }
-    resources = [aws_kms_key.ecr_sign_key.arn]
+
+    # Creates cycle: module.ecr.data.aws_iam_policy_document.ecr_sign_key_policy, module.ecr.aws_kms_key.ecr_sign_key
+    # resources = [aws_kms_key.ecr_sign_key.arn]
+    resources = ["*"]
   }
 
   statement {
-    sid       = "AllowRootAllActionsOnKey"
-    effect    = "Allow"
-    actions   = ["kms:*"]
-    resources = [aws_kms_key.ecr_sign_key.arn]
+    sid     = "AllowRootAllActionsOnKey"
+    effect  = "Allow"
+    actions = ["kms:*"]
+
+    # Creates cycle: module.ecr.data.aws_iam_policy_document.ecr_sign_key_policy, module.ecr.aws_kms_key.ecr_sign_key
+    # resources = [aws_kms_key.ecr_sign_key.arn]
+    resources = ["*"]
 
     principals {
       type        = "AWS"
@@ -30,18 +36,6 @@ data "aws_iam_policy_document" "ecr_sign_key_policy" {
 }
 
 data "aws_iam_policy_document" "allow_github_to_use_ecr_sign_key" {
-  #   statement {
-  #     sid = "AllowRootAllActionsOnKey"
-  #     effect = "Allow"
-  #     actions = ["kms:*"]
-  #     resources = ["*"]
-
-  #     principals {
-  #       type = "AWS"
-  #       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
-  #     }
-  #   }
-
   statement {
     sid    = "AllowECRSignVerifyKeyUse"
     effect = "Allow"
@@ -57,11 +51,6 @@ data "aws_iam_policy_document" "allow_github_to_use_ecr_sign_key" {
       "kms:TagResource"
     ]
 
-    # principals {
-    #   type = "AWS"
-    #   identifiers = [ aws_iam_role.github_ecr_role.arn ]
-    # }
-
     resources = [
       aws_kms_key.ecr_sign_key.arn,
       aws_kms_alias.ecr_sign_key_alias.arn
@@ -74,7 +63,6 @@ data "aws_iam_policy_document" "trust_policy_for_github_roles" {
     for_each = toset(var.github_repositories)
 
     content {
-      #   sid     = "TrustPolicyForGithubECRRole"
       effect  = "Allow"
       actions = ["sts:AssumeRoleWithWebIdentity"]
 
@@ -121,10 +109,6 @@ data "aws_iam_policy_document" "allow_github_role_to_use_codedeploy" {
       "codedeploy:List*",
       "codedeploy:RegisterApplicationRevision"
     ]
-    # principals {
-    #   type = "AWS"
-    #   identifiers = [ aws_iam_role.github_codedeploy_role.arn ]
-    # }
 
     resources = ["*"]
   }

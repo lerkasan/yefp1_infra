@@ -1,14 +1,3 @@
-# resource "aws_route53_zone" "www" {
-#   name = join(".", ["www", data.aws_route53_zone.this.name])
-
-#   tags = {
-#     Name        = join("_", [var.project_name, "_www_route53_zone"])
-#     terraform   = "true"
-#     environment = var.environment
-#     project     = var.project_name
-#   }
-# }
-
 resource "aws_route53_record" "www" {
   zone_id = data.aws_route53_zone.this.zone_id
   name    = local.website_domain_name

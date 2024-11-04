@@ -24,9 +24,6 @@ module "allow_push_to_ecr_iam_policy" {
     Statement = [
       {
         Effect = "Allow"
-        # Action = [
-        #   "ecr:*"
-        # ]
         Action = [
           "ecr:ListTagsForResource",
           "ecr:ListImages",
@@ -57,9 +54,8 @@ module "allow_push_to_ecr_iam_policy" {
 }
 
 resource "aws_iam_role" "github_ecr_role" {
-  name        = join("", [title(var.project_name), "github_ecr_role"])
-  description = "The role for Github Actions to sign docker images and push them to ECR"
-  #   assume_role_policy = data.aws_iam_policy_document.assume_role_ec2.json
+  name               = join("", [title(var.project_name), "github_ecr_role"])
+  description        = "The role for Github Actions to sign docker images and push them to ECR"
   assume_role_policy = data.aws_iam_policy_document.trust_policy_for_github_roles.json
 
   tags = {
@@ -71,9 +67,8 @@ resource "aws_iam_role" "github_ecr_role" {
 }
 
 resource "aws_iam_role" "github_codedeploy_role" {
-  name        = join("", [title(var.project_name), "github_codedeploy_role"])
-  description = "The role for Github Actions to deploy backend via CodeDeploy"
-  #   assume_role_policy = data.aws_iam_policy_document.assume_role_ec2.json
+  name               = join("", [title(var.project_name), "github_codedeploy_role"])
+  description        = "The role for Github Actions to deploy backend via CodeDeploy"
   assume_role_policy = data.aws_iam_policy_document.trust_policy_for_github_roles.json
 
   tags = {

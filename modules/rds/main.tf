@@ -11,7 +11,7 @@ resource "aws_db_instance" "primary" {
   db_name        = aws_ssm_parameter.database_name.value
   username       = aws_ssm_parameter.database_username.value
   password       = aws_ssm_parameter.database_password.value
-  #   multi_az                = true      # commented because it adds additional 15-20 minutes to create RDS instance
+  #   multi_az                = true      # creating multi-AZ RDS instance will take about 30 minutes instead of 10 minutes
   availability_zone               = local.availability_zones[0]
   db_subnet_group_name            = aws_db_subnet_group.this.name
   vpc_security_group_ids          = [var.rds_sg_id]
@@ -20,7 +20,7 @@ resource "aws_db_instance" "primary" {
   kms_key_id                      = aws_kms_key.database_encrypt_key.arn
   auto_minor_version_upgrade      = true
   maintenance_window              = var.database_maintenance_window
-  enabled_cloudwatch_logs_exports = ["postgresql"] # audit, error, general, slowquery - mysql;     postgresql, upgrade - postgres
+  enabled_cloudwatch_logs_exports = ["postgresql"] # audit, error, general, slowquery - mysql; /    postgresql, upgrade - postgres
   skip_final_snapshot             = true
 
   tags = {
@@ -43,9 +43,7 @@ resource "aws_db_subnet_group" "this" {
   }
 }
 
-
-
-# # Read replica - commented because it adds additional 15-20 minutes to create RDS instance
+# # Read replica - it adds additional 30 minutes to create multi-AZ read replica
 # resource "aws_db_instance" "read_replica" {
 #   identifier                      = "db-read-replica"
 #   replicate_source_db             = aws_db_instance.primary.identifier

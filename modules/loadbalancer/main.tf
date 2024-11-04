@@ -23,8 +23,7 @@ resource "aws_lb" "app" {
 }
 
 resource "aws_lb_target_group" "backend_rds_app" {
-  name = join("-", [var.project_name, "-app-tg"])
-  #   name     = join("-", [var.project_name, "backend-rds-app-tg"])
+  name                 = join("-", [var.project_name, "-app-tg"])
   port                 = local.backend_rds_app_port
   protocol             = "HTTP"
   vpc_id               = var.vpc_id
@@ -46,8 +45,7 @@ resource "aws_lb_target_group" "backend_rds_app" {
   }
 
   tags = {
-    Name = join("_", [var.project_name, "_app_tg"])
-    # Name        = join("_", [var.project_name, "backend_rds_app_tg"])
+    Name        = join("_", [var.project_name, "_app_tg"])
     terraform   = "true"
     environment = var.environment
     project     = var.project_name
@@ -114,21 +112,6 @@ resource "aws_lb_listener" "https" {
   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = data.aws_acm_certificate.this.arn
 
-  #   default_action {
-  #     type             = "forward"
-  #     target_group_arn = aws_lb_target_group.app.arn
-  #   }
-
-  #   default_action {
-  #     type = "fixed-response"
-
-  #     fixed_response {
-  #       content_type = "text/plain"
-  #       message_body = "OK"
-  #       status_code  = "200"
-  #     }
-  #   }
-
   default_action {
     type = "redirect"
 
@@ -148,26 +131,6 @@ resource "aws_lb_listener" "https" {
   }
 }
 
-# resource "aws_lb_listener" "https_backend_redis" {
-#   load_balancer_arn = aws_lb.app.arn
-#   port              = local.https_port
-#   protocol          = "HTTPS"
-#   ssl_policy        = "ELBSecurityPolicy-2016-08"
-#   certificate_arn   = data.aws_acm_certificate.this.arn
-
-#   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.backend_redis_app.arn
-#   }
-
-#   tags = {
-#     Name        = join("_", [var.project_name, "_backend_redis_app_lb_listener"])
-#     terraform   = "true"
-#     environment = var.environment
-#     project     = var.project_name
-#   }
-# }
-
 resource "aws_lb_listener_rule" "backend_rds" {
   listener_arn = aws_lb_listener.https.arn
   priority     = 100
@@ -176,12 +139,6 @@ resource "aws_lb_listener_rule" "backend_rds" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.backend_rds_app.arn
   }
-
-  #   condition {
-  #     path_pattern {
-  #       values = ["/api/*"]
-  #     }
-  #   }
 
   condition {
     host_header {
@@ -205,12 +162,6 @@ resource "aws_lb_listener_rule" "backend_redis" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.backend_redis_app.arn
   }
-
-  #   condition {
-  #     path_pattern {
-  #       values = ["/cache/*"]
-  #     }
-  #   }
 
   condition {
     host_header {

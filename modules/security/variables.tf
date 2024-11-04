@@ -23,8 +23,9 @@ variable "private_subnet_cidrs" {
   type        = list(string)
 }
 
-# variable "admin_public_ip" {
-#   description = "Admin public IP for SSH access rule"
+# Don't use it now because a bastion server is not created. Uncomment if using bastion server.
+# variable "admin_ip" {
+#   description = "Admin/Bastion IP for SSH access rule"
 #   type        = string
 #   sensitive = true
 
